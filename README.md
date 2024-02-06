@@ -1,2 +1,2 @@
 # python3-qtextrawidgets
-Custom PySide2 widgets
+custom pyside2 widgets
