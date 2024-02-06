@@ -54,7 +54,7 @@ class QStackedWindow(QWidget):
 		self.lstNav.itemClicked.connect(self.setCurrentStack)
 		lay.addWidget(self.stkPan,1,1,1,1)
 		lay.setColumnStretch(1,1)
-		lay.addWidget(self.lblPortrait,1,1,1,1)
+		lay.addWidget(self.lblPortrait,1,1,1,1,Qt.AlignTop|Qt.AlignLeft)
 		self.setLayout(lay)
 	#def _renderGui
 
@@ -241,7 +241,7 @@ class QStackedWindow(QWidget):
 			lbl.setAlignment(Qt.AlignTop)
 			lbl.setTextInteractionFlags(Qt.TextBrowserInteraction)
 			lbl.linkActivated.connect(self._linkStack)
-			lay.addWidget(lbl)
+			lay.addWidget(lbl,lay.rowCount(),0,1,1,Qt.AlignCenter|Qt.AlignLeft)
 		#self.lblPortrait.setText("<br>".join(txt))
 		self.lblPortrait.setLayout(lay)
 	#def generatePortrait
