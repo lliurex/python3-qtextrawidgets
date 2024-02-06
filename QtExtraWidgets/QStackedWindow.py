@@ -20,7 +20,6 @@ QString=type("")
 QInt=type(0)
 
 class QStackedWindow(QWidget):
-	pending=Signal()
 	def __init__(self,*args,**kwargs):
 		parent=kwargs.get("parent")
 		if parent==None:
@@ -252,9 +251,10 @@ class QStackedWindow(QWidget):
 	#def showPortrait
 			
 	def setWiki(self,url):
-		#url=self._searchWiki()
 		desc=_("Wiki help")
 		lbl_wiki=QLabel("<a href=\"{0}\"><span style=\"text-align: right;\">{1}</span></a>".format(url,desc))
 		lbl_wiki.setOpenExternalLinks(True)
 		lbl_wiki.setToolTip(url)
 		self.layout().addWidget(lbl_wiki,0,1,Qt.AlignTop|Qt.AlignRight)
+	#def setWiki
+#class QStackedWindow
