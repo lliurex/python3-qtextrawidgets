@@ -1,6 +1,8 @@
 python3-qtextrawidgets (0.1) jammy; urgency=medium
 
   * First release
+  *  QCheckableComboBox,QHotkeyButton,QInfoLabel,QScreenShotContainer,QScrollLabel
+  *  QSearchBox,QStackedWindowItem,QStackedWindow,QTableTouchWidget
 
  -- Juanma1980 <juanma1980@gmail.com>  Tue, 16 Jan 2024 12:10:44 +0100
 
