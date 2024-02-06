@@ -1,4 +1,4 @@
-python3-qtextrawidgets (0.2) jammy; urgency=medium
+python3-qtextrawidgets (0.1) jammy; urgency=medium
 
   * First release
   *  QCheckableComboBox,QHotkeyButton,QInfoLabel,QScreenShotContainer,QScrollLabel
