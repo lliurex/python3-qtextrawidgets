@@ -251,4 +251,10 @@ class QStackedWindow(QWidget):
 		self.stkPan.setVisible(not show)
 	#def showPortrait
 			
-			
+	def setWiki(self,url):
+		#url=self._searchWiki()
+		desc=_("Wiki help")
+		lbl_wiki=QLabel("<a href=\"{0}\"><span style=\"text-align: right;\">{1}</span></a>".format(url,desc))
+		lbl_wiki.setOpenExternalLinks(True)
+		lbl_wiki.setToolTip(url)
+		self.layout().addWidget(lbl_wiki,0,1,Qt.AlignTop|Qt.AlignRight)
