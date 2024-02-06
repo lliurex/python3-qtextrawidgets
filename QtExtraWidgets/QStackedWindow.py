@@ -33,10 +33,7 @@ class QStackedWindow(QWidget):
 		self.referer=-1
 		self.setAttribute(Qt.WA_DeleteOnClose, True)
 		self.lblBanner=QLabel()
-		self.lblPortrait=QLabel()
-		self.lblPortrait.setTextFormat(Qt.RichText)
-		self.lblPortrait.setAlignment(Qt.AlignTop)
-		self.lblPortrait.setTextInteractionFlags(Qt.TextBrowserInteraction)
+		self.lblPortrait=QWidget()
 		self.lstNav=QListWidget()
 		self.stkPan=QStackedWidget()
 		self.curStack=None
@@ -229,18 +226,24 @@ class QStackedWindow(QWidget):
 	#def _importStacks(self):
 
 	def _linkStack(self,*args):
-		idx=int(args[0])+1
+		idx=int(args[0])
 		self.lstNav.setCurrentRow(idx)
-		self.setCurrentStack(idx)
+		self.setCurrentStack()
 	#def _linkStack
 
 	def generatePortrait(self):
 		txt=[]
+		lay=QGridLayout()
 		for idx in range(self.lstNav.count()):
 			item=self.lstNav.item(idx)
-			txt.append("&nbsp;*&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
-		self.lblPortrait.setText("<br>".join(txt))
-		self.lblPortrait.linkActivated.connect(self._linkStack)
+			lbl=QLabel("&nbsp;*&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
+			lbl.setTextFormat(Qt.RichText)
+			lbl.setAlignment(Qt.AlignTop)
+			lbl.setTextInteractionFlags(Qt.TextBrowserInteraction)
+			lbl.linkActivated.connect(self._linkStack)
+			lay.addWidget(lbl)
+		#self.lblPortrait.setText("<br>".join(txt))
+		self.lblPortrait.setLayout(lay)
 	#def generatePortrait
 
 	def showPortrait(self,show=True):
