@@ -121,12 +121,12 @@ class QStackedWindow(QWidget):
 	#def setCurrentStack
 
 	def setIcon(self,ficon):
-		self._debug("Icon: {}".format(icon))
+		self._debug("Icon: {}".format(ficon))
 		if os.path.isfile(ficon):
 			icon=QtGui.QIcon(ficon)
 		else:
-			icon=QtGui.QIcon.fromTheme(icon)
-		self.setWindowIcon(icn)
+			icon=QtGui.QIcon.fromTheme(ficon)
+		self.setWindowIcon(icon)
 	#def setIcon
 
 	def setBanner(self,banner):
