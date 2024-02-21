@@ -8,13 +8,6 @@ import traceback
 from PySide2.QtWidgets import QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal
-import gettext
-try:
-	confText=gettext.translation("python3-appconfig")
-	_ = confText.gettext
-except:
-	gettext.textdomain('python3-appconfig')
-	_ = gettext.gettext
 
 QString=type("")
 QInt=type(0)
@@ -36,6 +29,7 @@ class QStackedWindow(QWidget):
 		self.lstNav=QListWidget()
 		self.stkPan=QStackedWidget()
 		self.curStack=None
+		self.rsrc="/usr/share/appconfig"
 		self._renderGui()
 		self.showPortrait()
 	#def init
@@ -251,7 +245,7 @@ class QStackedWindow(QWidget):
 	#def showPortrait
 			
 	def setWiki(self,url):
-		desc=_("Wiki help")
+		desc=("Wiki")
 		lbl_wiki=QLabel("<a href=\"{0}\"><span style=\"text-align: right;\">{1}</span></a>".format(url,desc))
 		lbl_wiki.setOpenExternalLinks(True)
 		lbl_wiki.setToolTip(url)
