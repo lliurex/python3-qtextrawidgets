@@ -1,10 +1,10 @@
-python3-qtextrawidgets (0.2-0lliurex21) focal; urgency=medium
+python3-qtextrawidgets (0.2-0lliurex23) jammy; urgency=medium
 
   * Remove gettext from qstackedwindow
 
  -- Juanma1980 <juanma1980@gmail.com>  Wed, 21 Feb 2024 11:03:22 +0100
 
-python3-qtextrawidgets (0.1) focal; urgency=medium
+python3-qtextrawidgets (0.1) jammy; urgency=medium
 
   * First release
   *  QCheckableComboBox,QHotkeyButton,QInfoLabel,QScreenShotContainer,QScrollLabel
