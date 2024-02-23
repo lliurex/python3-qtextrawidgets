@@ -25,7 +25,7 @@ class QStackedWindow(QWidget):
 		self.referer=-1
 		self.setAttribute(Qt.WA_DeleteOnClose, True)
 		self.lblBanner=QLabel()
-		self.lblPortrait=QWidget()
+		self.lstPortrait=QListWidget()
 		self.lstNav=QListWidget()
 		self.stkPan=QStackedWidget()
 		self.curStack=None
@@ -47,7 +47,7 @@ class QStackedWindow(QWidget):
 		self.lstNav.itemClicked.connect(self.setCurrentStack)
 		lay.addWidget(self.stkPan,1,1,1,1)
 		lay.setColumnStretch(1,1)
-		lay.addWidget(self.lblPortrait,1,1,1,1,Qt.AlignTop|Qt.AlignLeft)
+		lay.addWidget(self.lstPortrait,1,1,1,1)
 		self.setLayout(lay)
 	#def _renderGui
 
@@ -219,28 +219,35 @@ class QStackedWindow(QWidget):
 	#def _importStacks(self):
 
 	def _linkStack(self,*args):
-		idx=int(args[0])
+		if len(args)>0:
+			idx=int(args[0])
+		else:
+			idx=self.lstPortrait.currentRow()
 		self.lstNav.setCurrentRow(idx)
 		self.setCurrentStack()
 	#def _linkStack
 
 	def generatePortrait(self):
 		txt=[]
-		lay=QGridLayout()
+		#lay=QGridLayout()
 		for idx in range(self.lstNav.count()):
 			item=self.lstNav.item(idx)
-			lbl=QLabel("&nbsp;*&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
+			lbl=QLabel("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
 			lbl.setTextFormat(Qt.RichText)
 			lbl.setAlignment(Qt.AlignTop)
 			lbl.setTextInteractionFlags(Qt.TextBrowserInteraction)
 			lbl.linkActivated.connect(self._linkStack)
-			lay.addWidget(lbl,lay.rowCount(),0,1,1,Qt.AlignCenter|Qt.AlignLeft)
-		#self.lblPortrait.setText("<br>".join(txt))
-		self.lblPortrait.setLayout(lay)
+			itm=QListWidgetItem()
+			self.lstPortrait.addItem(itm)
+			self.lstPortrait.setItemWidget(itm,lbl)
+		#self.lstPortrait.setText("<br>".join(txt))
+		self.lstPortrait.itemSelectionChanged.connect(self._linkStack)
+		#lay.addWidget(lst,0,0,1,1)
+		#self.lstPortrait.setLayout(lay)
 	#def generatePortrait
 
 	def showPortrait(self,show=True):
-		self.lblPortrait.setVisible(show)
+		self.lstPortrait.setVisible(show)
 		self.stkPan.setVisible(not show)
 	#def showPortrait
 			
