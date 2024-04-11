@@ -4,23 +4,55 @@ import os
 import importlib
 import inspect
 import time
+from queue import Queue
 import traceback
 from PySide2.QtWidgets import QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget
 from PySide2 import QtGui
-from PySide2.QtCore import Qt,Signal
-
+from PySide2.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
 QString=type("")
 QInt=type(0)
 
+class signalsLoader(QObject):
+	finished = Signal("PyObject")
+#class signalsLoader
+
+class moduleLoader(QRunnable):
+	def __init__(self,path,queue,parent=None):
+		QRunnable.__init__(self, parent)
+		self.path=path
+		self.queue=queue
+		self.signals=signalsLoader()
+
+	@Slot()
+	def run(self):
+		module=None
+		spec=None
+		index=-1
+		if self.path.endswith(".py") and os.path.basename(self.path)!='__init__.py':
+			if os.path.dirname(self.path) not in sys.path:
+				sys.path.append( os.path.dirname(self.path))
+			modName=os.path.basename(self.path.replace(".py","")).replace("/",".")
+			try:
+				modpackage=os.path.basename(os.path.dirname(self.path))
+				spec = importlib.util.spec_from_file_location("{}.{}".format(modpackage,modName),self.path,submodule_search_locations=[os.path.dirname(self.path)])
+				module = importlib.util.module_from_spec(spec)
+			except Exception as e:
+				self._debug("Unable to load {0} (perhaps aux lib): {1}".format(module,str(e)))
+				module=None
+				traceback.print_exc()
+		self.queue.put((module,spec))
+	#def _importModuleFromFile
+
+
 class QStackedWindow(QWidget):
 	def __init__(self,*args,**kwargs):
-		parent=kwargs.get("parent")
-		if parent==None:
+		self.parent=kwargs.get("parent")
+		if self.parent==None:
 			for i in args:
 				if isinstance(i,QWidget):
-					parent=i
-		super(QStackedWindow,self).__init__(parent)
-		self.dbg=False
+					self.parent=i
+		super(QStackedWindow,self).__init__(self.parent)
+		self.dbg=True
 		self.current=-1
 		self.referer=-1
 		self.setAttribute(Qt.WA_DeleteOnClose, True)
@@ -174,7 +206,7 @@ class QStackedWindow(QWidget):
 			except Exception as e:
 				print("ERROR on {}: {}".format(module,e))
 				module=None
-				traceback.print_exc()
+				#traceback.print_exc()
 		return(module)
 	#def _importModuleFromFile
 
@@ -185,7 +217,8 @@ class QStackedWindow(QWidget):
 			if name.lower()==module.__name__.split(".")[-1].lower():
 				test=includedClass[1]
 				try:
-					moduleClass=test(parent=self)
+					print(self.parent)
+					moduleClass=test()
 				except Exception as e:
 					self._debug("Unable to import {0}: {1}".format(module,str(e)))
 					traceback.print_exc()
@@ -198,18 +231,65 @@ class QStackedWindow(QWidget):
 		return(moduleClass)
 	#def _getClassFromMod
 
+	def _processModule(self,module):
+		if module!=None:
+			self._debug("Found module {}".format(module))
+			moduleClass=self._getClassFromMod(module)
+			if moduleClass!=None:
+				props=moduleClass.getProps()
+				self.modulesByIndex[props.get("index",1)]=moduleClass
+			self._debug("Imported module {}".format(module))
+
 	def addStacksFromFolder(self,dpath="stacks"):
 		if os.path.isdir(dpath)==False:
 			print("addStacksFromFolder: ./{} not found".format(dpath))
 			return
+		moduleClass=None
 		modulesByIndex={}
+		self.queue=Queue()
+		self.threadpool = QThreadPool()
 		for plugin in os.scandir(dpath):
-			module=self._importModuleFromFile(plugin.path)
-			if module!=None:
-				moduleClass=self._getClassFromMod(module)
-				if moduleClass!=None:
-					props=moduleClass.getProps()
-					modulesByIndex[props.get("index",1)]=moduleClass
+			self._debug("Inspecting file {}".format(plugin.path))
+			loader=moduleLoader(plugin.path,self.queue)
+			#loader.signals.finished.connect(self._processModule)
+			self.threadpool.start(loader)
+		self.threadpool.waitForDone()
+		#return
+#			module=self._importModuleFromFile(plugin.path)
+#			if module!=None:
+#				self._debug("Found module {}".format(module))
+#				moduleClass=self._getClassFromMod(module)
+#				if moduleClass!=None:
+#					props=moduleClass.getProps()
+#					modulesByIndex[props.get("index",1)]=moduleClass
+#				self._debug("Imported module {}".format(module))
+		while self.queue.empty()==False:
+			(module,spec)=self.queue.get()
+			try:
+				spec.loader.exec_module(module)
+			except Exception as e:
+				print("ERROR on {}: {}".format(module,e))
+				module=None
+				#traceback.print_exc()
+				continue
+			for includedClass in inspect.getmembers(module, predicate=inspect.isclass):
+				name,obj=(includedClass)
+				if name.lower()==module.__name__.split(".")[-1].lower():
+					test=includedClass[1]
+					try:
+						moduleClass=test(parent=self)
+					except Exception as e:
+						traceback.print_exc()
+					else:
+						break
+			if moduleClass!=None:
+				index=len(modulesByIndex)
+				if hasattr(moduleClass,"enabled"):
+					if moduleClass.enabled==False:
+						moduleClass=None
+				if hasattr(moduleClass,"index"):
+					index=moduleClass.index
+				modulesByIndex.update({index:moduleClass})
 		for mod in sorted(modulesByIndex.keys()):
 			self.addStack(modulesByIndex[mod])
 		if len(modulesByIndex)<=1:
