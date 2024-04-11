@@ -1,3 +1,10 @@
+python3-qtextrawidgets (0.2.2-0lliurex23) jammy; urgency=medium
+
+  * Use qthreads for importing stacks in QStackedWindow
+  * Add QInfoPushButton
+
+ -- Juanma1980 <juanma1980@gmail.com>  Thu, 11 Apr 2024 12:56:52 +0200
+
 python3-qtextrawidgets (0.2.1-0lliurex23) jammy; urgency=medium
 
   * Remove gettext from qstackedwindow
