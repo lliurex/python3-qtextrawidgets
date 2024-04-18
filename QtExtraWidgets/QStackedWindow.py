@@ -6,9 +6,10 @@ import inspect
 import time
 from queue import Queue
 import traceback
-from PySide2.QtWidgets import QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget
+from PySide2.QtWidgets import QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
+from QtExtraWidgets import QPushInfoButton as qinfo,QTableTouchWidget as qtouch
 QString=type("")
 QInt=type(0)
 
@@ -58,7 +59,8 @@ class QStackedWindow(QWidget):
 		self.referer=-1
 		self.setAttribute(Qt.WA_DeleteOnClose, True)
 		self.lblBanner=QLabel()
-		self.lstPortrait=QListWidget()
+		#self.lstPortrait=QListWidget()
+		self.lstPortrait=qtouch.QTableTouchWidget()
 		self.lstNav=QListWidget()
 		self.stkPan=QStackedWidget()
 		self.curStack=None
@@ -177,6 +179,7 @@ class QStackedWindow(QWidget):
 	def addStack(self,stack,**kwargs):
 		callback=kwargs.get("callback",stack.__initScreen__)
 		props=stack.getProps()
+		stack.parent=self
 		icon=QtGui.QIcon.fromTheme(props.get("icon"))
 		self.stkPan.insertWidget(props.get("index"),stack)
 		item=QListWidgetItem(icon,props.get("shortDesc"))
@@ -233,7 +236,6 @@ class QStackedWindow(QWidget):
 			(module,spec)=self.queue.get()
 			(index,moduleClass)=self._inspectModule(module,spec)
 			if moduleClass!=None:
-				print("IDX: {} MOD: {}".format(index,moduleClass))
 				if index==-1:
 					index=len(modulesByIndex)
 				modulesByIndex.update({index:moduleClass})
@@ -247,28 +249,54 @@ class QStackedWindow(QWidget):
 
 	def _linkStack(self,*args):
 		if len(args)>0:
-			idx=int(args[0])
+			if isinstance(args[0],int):
+				idx=int(args[0])
+			else:
+				idx=(self.lstPortrait.currentRow()*self.lstPortrait.currentColumn())+self.lstPortrait.currentColumn()
 		else:
 			idx=self.lstPortrait.currentRow()
 		self.lstNav.setCurrentRow(idx)
 		self.setCurrentStack()
 	#def _linkStack
 
-	def generatePortrait(self):
+	def generatePortrait(self,mode="list",cols=1):
 		txt=[]
 		#lay=QGridLayout()
+		self.lstPortrait.setRowCount(0)
+		mode="grid"
+		cols=3
+		self.lstPortrait.setColumnCount(cols)
+		self.lstPortrait.verticalHeader().hide()
+		self.lstPortrait.horizontalHeader().hide()
+		self.lstPortrait.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+		curCol=0
 		for idx in range(self.lstNav.count()):
 			item=self.lstNav.item(idx)
-			lbl=QLabel("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
-			lbl.setTextFormat(Qt.RichText)
-			lbl.setAlignment(Qt.AlignTop)
-			lbl.setTextInteractionFlags(Qt.TextBrowserInteraction)
-			lbl.linkActivated.connect(self._linkStack)
-			itm=QListWidgetItem()
-			self.lstPortrait.addItem(itm)
-			self.lstPortrait.setItemWidget(itm,lbl)
+			if mode=="grid":
+				if curCol==cols or self.lstPortrait.rowCount()==0:
+					curCol=0
+					self.lstPortrait.setRowCount(self.lstPortrait.rowCount()+1)
+					self.lstPortrait.verticalHeader().setSectionResizeMode(self.lstPortrait.rowCount()-1,QHeaderView.Stretch)
+				btn=qinfo.QPushInfoButton()
+				btn.setText(item.text())
+				icn=item.icon()
+				btn.setIcon(icn)
+				btn.setDescription(item.toolTip())
+				btn.clicked.connect(self._linkStack)
+				#("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
+				self.lstPortrait.setCellWidget(self.lstPortrait.rowCount()-1,curCol,btn)
+				curCol+=1
+				pass
+			else:
+				self.lstPortrait.setRowCount(self.lstPortrait.rowCount()+1)
+				lbl=QLabel("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
+				lbl.setTextFormat(Qt.RichText)
+				lbl.setAlignment(Qt.AlignTop)
+				lbl.setTextInteractionFlags(Qt.TextBrowserInteraction)
+				lbl.linkActivated.connect(self._linkStack)
+				self.lstPortrait.setCellWidget(self.lstPortrait.rowCount()-1,0,lbl)
 		#self.lstPortrait.setText("<br>".join(txt))
-		self.lstPortrait.itemSelectionChanged.connect(self._linkStack)
+		#self.lstPortrait.selectionChanged.connect(self._linkStack)
 		#lay.addWidget(lst,0,0,1,1)
 		#self.lstPortrait.setLayout(lay)
 	#def generatePortrait
