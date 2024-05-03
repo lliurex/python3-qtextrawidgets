@@ -218,6 +218,7 @@ class QStackedWindow(QWidget):
 					props=moduleClass.getProps()
 					index=props.get("index",-1)
 		return(index,moduleClass)
+	#def _inspectModule
 
 	def addStacksFromFolder(self,dpath="stacks"):
 		if os.path.isdir(dpath)==False:
@@ -248,57 +249,70 @@ class QStackedWindow(QWidget):
 	#def _importStacks(self):
 
 	def _linkStack(self,*args):
+		idx=-1
 		if len(args)>0:
 			if isinstance(args[0],int):
-				idx=int(args[0])
-			else:
-				idx=(self.lstPortrait.currentRow()*self.lstPortrait.currentColumn())+self.lstPortrait.currentColumn()
+				idx=args[0]
+			elif isinstance(args[0],str):
+				if args[0].isnumeric()==True:
+					idx=int(args[0])
+			if idx==-1:
+				cRow=self.lstPortrait.currentRow()
+				cCol=self.lstPortrait.currentColumn()
+				idx=(cRow*cCol)+cCol
 		else:
 			idx=self.lstPortrait.currentRow()
 		self.lstNav.setCurrentRow(idx)
 		self.setCurrentStack()
 	#def _linkStack
 
+	def _fillGrid(self):
+		cols=self.tblGrid.columnCount()
+		curCol=0
+		for idx in range(self.lstNav.count()):
+			item=self.lstNav.item(idx)
+			if curCol==cols or self.lstPortrait.rowCount()==0:
+				curCol=0
+				self.lstPortrait.setRowCount(self.lstPortrait.rowCount()+1)
+				self.lstPortrait.verticalHeader().setSectionResizeMode(self.lstPortrait.rowCount()-1,QHeaderView.ResizeToContent)
+				self.lstPortrait.horizontalHeader().setSectionResizeMode(self.lstPortrait.ColumnCount()-1,QHeaderView.Stretch)
+			btn=qinfo.QPushInfoButton()
+			btn.setText(item.text())
+			icn=item.icon()
+			btn.setIcon(icn)
+			btn.setDescription(item.toolTip())
+			btn.clicked.connect(self._linkStack)
+			#("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
+			self.lstPortrait.setCellWidget(self.lstPortrait.rowCount()-1,curCol,btn)
+			curCol+=1
+	#def _fillGrid(self):
+
+	def _fillList(self):
+		self.lstPortrait.setColumnCount(1)
+		self.lstPortrait.setShowGrid(False)
+		for idx in range(self.lstNav.count()):
+			item=self.lstNav.item(idx)
+			self.lstPortrait.setRowCount(self.lstPortrait.rowCount()+1)
+			lbl=QLabel("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
+			lbl.setTextFormat(Qt.RichText)
+			lbl.setAlignment(Qt.AlignTop)
+			lbl.setTextInteractionFlags(Qt.TextBrowserInteraction)
+			lbl.linkActivated.connect(self._linkStack)
+			self.lstPortrait.setCellWidget(self.lstPortrait.rowCount()-1,0,lbl)
+	#def fillList(self):
+
 	def generatePortrait(self,mode="list",cols=1):
 		txt=[]
 		#lay=QGridLayout()
 		self.lstPortrait.setRowCount(0)
-		mode="grid"
-		cols=3
-		self.lstPortrait.setColumnCount(cols)
+		self.lstPortrait.setColumnCount(3)
 		self.lstPortrait.verticalHeader().hide()
 		self.lstPortrait.horizontalHeader().hide()
 		self.lstPortrait.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-		curCol=0
-		for idx in range(self.lstNav.count()):
-			item=self.lstNav.item(idx)
-			if mode=="grid":
-				if curCol==cols or self.lstPortrait.rowCount()==0:
-					curCol=0
-					self.lstPortrait.setRowCount(self.lstPortrait.rowCount()+1)
-					self.lstPortrait.verticalHeader().setSectionResizeMode(self.lstPortrait.rowCount()-1,QHeaderView.Stretch)
-				btn=qinfo.QPushInfoButton()
-				btn.setText(item.text())
-				icn=item.icon()
-				btn.setIcon(icn)
-				btn.setDescription(item.toolTip())
-				btn.clicked.connect(self._linkStack)
-				#("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
-				self.lstPortrait.setCellWidget(self.lstPortrait.rowCount()-1,curCol,btn)
-				curCol+=1
-				pass
-			else:
-				self.lstPortrait.setRowCount(self.lstPortrait.rowCount()+1)
-				lbl=QLabel("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
-				lbl.setTextFormat(Qt.RichText)
-				lbl.setAlignment(Qt.AlignTop)
-				lbl.setTextInteractionFlags(Qt.TextBrowserInteraction)
-				lbl.linkActivated.connect(self._linkStack)
-				self.lstPortrait.setCellWidget(self.lstPortrait.rowCount()-1,0,lbl)
-		#self.lstPortrait.setText("<br>".join(txt))
-		#self.lstPortrait.selectionChanged.connect(self._linkStack)
-		#lay.addWidget(lst,0,0,1,1)
-		#self.lstPortrait.setLayout(lay)
+		if mode=="grid":
+			self._fillGrid()
+		else:
+			self._fillList()
 	#def generatePortrait
 
 	def showPortrait(self,show=True):
