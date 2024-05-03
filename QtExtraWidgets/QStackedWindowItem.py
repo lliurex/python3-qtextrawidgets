@@ -19,6 +19,7 @@ except:
 class QStackedWindowItem(QWidget):
 	updated=Signal()
 	def __init__(self,*args,**kwargs):
+		super().__init__(*args,**kwargs)
 		if kwargs.get("parent","")!="":
 			self.parent=kwargs["parent"]
 		else:
@@ -26,7 +27,6 @@ class QStackedWindowItem(QWidget):
 				if isinstance(i,QWidget):
 					self.parent=i
 					break
-		super().__init__(*args,**kwargs)
 		self.dbg=False
 		self.props={"icon":'shell',
 			"shortDesc":_("Configure stack"),
