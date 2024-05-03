@@ -6,13 +6,17 @@ class QHotkeyButton(QPushButton):
 	keybind_signal=Signal("PyObject")
 	hotkeyAssigned=Signal("PyObject")
 	def __init__(self,*args,**kwargs):
+		text=""
 		parent = kwargs.get('parent')
 		if not parent:
 			for i in args:
 				if isinstance(i,QWidget):
 					parent = i
-		super().__init__(*args,**kwargs)
-		text = kwargs.get('text',"")
+				if isinstance(i,str):
+					text=i
+		super().__init__(*args)
+		text = kwargs.get('text',text)
+		self.alternate=kwargs.get('alternate',"")
 		self.installEventFilter(self)
 		self.keymap={}
 		for key,value in vars(Qt).items():
@@ -37,7 +41,7 @@ class QHotkeyButton(QPushButton):
 
 	def mousePressEvent(self, ev):
 		self.originalText=self.text()
-		self.setText("")
+		self.setText(self.alternate)
 		self.processed=False
 		self._grab_alt_keys()
 	#def mousePressEvent
