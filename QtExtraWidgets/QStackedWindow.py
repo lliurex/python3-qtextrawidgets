@@ -298,6 +298,8 @@ class QStackedWindow(QWidget):
 			lbl.setAlignment(Qt.AlignTop)
 			lbl.setTextInteractionFlags(Qt.TextBrowserInteraction)
 			lbl.linkActivated.connect(self._linkStack)
+			lbl.setAccessibleName(item.text())
+			lbl.setAccessibleDescription(item.toolTip())
 			self.lstPortrait.setCellWidget(self.lstPortrait.rowCount()-1,0,lbl)
 	#def fillList(self):
 
