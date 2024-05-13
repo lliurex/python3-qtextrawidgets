@@ -9,7 +9,7 @@ from QtExtraWidgets import QTableTouchWidget,QStackedWindowItem,QInfoLabel
 class QPushInfoButton(QPushButton):
 	clicked=Signal("PyObject")
 	def __init__(self,parent=None):
-		QPushButton.__init__(self, parent)
+		super().__init__()
 		self.cacheDir=os.path.join(os.environ.get('HOME'),".cache","rebost","imgs")
 		if os.path.exists(self.cacheDir)==False:
 			os.makedirs(self.cacheDir)
@@ -56,12 +56,14 @@ class QPushInfoButton(QPushButton):
 
 	def setText(self,text):
 		self.label.setText(text)
+		self.setAccessibleName(text)
 		self.label.setStyleSheet("font-weight: bold;")
 		self.adjustSize()
 	#def setText(self,text)
 
 	def setDescription(self,text):
 		self.description.setText(text)
+		self.setAccessibleDescription(text)
 		self.adjustSize()
 
 	def setTooltipText(self,text):
