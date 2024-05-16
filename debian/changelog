@@ -1,3 +1,9 @@
+python3-qtextrawidgets (0.3.1-0lliurex23) jammy; urgency=medium
+
+  * QStackWindow: Ignore stack data if it's disabled
+
+ -- Juanma1980 <juanma1980@gmail.com>  Thu, 16 May 2024 17:43:40 +0200
+
 python3-qtextrawidgets (0.3.0-0lliurex23) jammy; urgency=medium
 
   * QStackWindow: Portrait in grid or list mode
