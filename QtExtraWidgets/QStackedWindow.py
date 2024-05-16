@@ -186,6 +186,7 @@ class QStackedWindow(QWidget):
 		item.setToolTip(props.get("tooltip"))
 		idx=props.get("index")
 		item.setData(Qt.UserRole,idx)
+		item.setData(Qt.AccessibleDescriptionRole,props.get("longDesc"))
 		#item.setIcon(icon)
 		self.lstNav.insertItem(idx,item)
 		if props.get("visible",True)==False:
@@ -215,6 +216,7 @@ class QStackedWindow(QWidget):
 					if hasattr(moduleClass,"enabled"):
 						if moduleClass.enabled==False:
 							moduleClass=None
+							continue
 					props=moduleClass.getProps()
 					index=props.get("index",-1)
 		return(index,moduleClass)
@@ -293,7 +295,11 @@ class QStackedWindow(QWidget):
 		for idx in range(self.lstNav.count()):
 			item=self.lstNav.item(idx)
 			self.lstPortrait.setRowCount(self.lstPortrait.rowCount()+1)
-			lbl=QLabel("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
+
+			txt=item.data(Qt.AccessibleDescriptionRole)
+			if len(txt)<=0:
+				txt=item.toolTip()
+			lbl=QLabel("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,txt))
 			lbl.setTextFormat(Qt.RichText)
 			lbl.setAlignment(Qt.AlignTop)
 			lbl.setTextInteractionFlags(Qt.TextBrowserInteraction)
