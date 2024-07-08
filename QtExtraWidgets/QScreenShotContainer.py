@@ -197,8 +197,9 @@ class QScreenShotContainer(QWidget):
 			return
 		visible = self.widget.itemAt(20, 20)
 		column=1
-		if visible is not None:
-			column=visible.column()
+		if visible==None:
+			return()
+		column=visible.column()
 		if args[0]=="left":
 			if column<=0:
 				column=self.widget.columnCount()

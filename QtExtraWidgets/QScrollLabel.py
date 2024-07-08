@@ -27,6 +27,10 @@ class QScrollLabel(QScrollArea):
 #		self.setFixedHeight(self.label.sizeHint().height()/2)
 	#def __init__
 
+	def text(self):
+		return(self.label.text())
+	#def text
+
 	def setText(self,text):
 		self.label.setText(text)
 #		self.setFixedWidth(self.label.sizeHint().width())
