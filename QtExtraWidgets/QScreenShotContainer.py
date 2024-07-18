@@ -10,13 +10,15 @@ class _loadScreenShot(QThread):
 		super().__init__()
 		self.img=args[0]
 		self.cacheDir=None
+		self.dbg=False
 		if len(args)>1:
 			self.setCacheDir(args[1])
 		self.destroyed.connect(self._clean)
 	#def __init__
 
 	def _debug(self,msg):
-		print("{}".format(msg))
+		if self.dbg==True:
+			print("{}".format(msg))
 	#def _debug
 
 	def _clean(self):
@@ -195,8 +197,9 @@ class QScreenShotContainer(QWidget):
 			return
 		visible = self.widget.itemAt(20, 20)
 		column=1
-		if visible is not None:
-			column=visible.column()
+		if visible==None:
+			return()
+		column=visible.column()
 		if args[0]=="left":
 			if column<=0:
 				column=self.widget.columnCount()

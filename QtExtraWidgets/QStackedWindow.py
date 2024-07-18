@@ -4,28 +4,63 @@ import os
 import importlib
 import inspect
 import time
+from queue import Queue
 import traceback
-from PySide2.QtWidgets import QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget
+from PySide2.QtWidgets import QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
 from PySide2 import QtGui
-from PySide2.QtCore import Qt,Signal
-
+from PySide2.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
+from QtExtraWidgets import QPushInfoButton as qinfo,QTableTouchWidget as qtouch
 QString=type("")
 QInt=type(0)
 
+class signalsLoader(QObject):
+	finished = Signal("PyObject")
+#class signalsLoader
+
+class moduleLoader(QRunnable):
+	def __init__(self,path,queue,parent=None):
+		QRunnable.__init__(self, parent)
+		self.path=path
+		self.queue=queue
+		self.signals=signalsLoader()
+	#def __init__
+
+	@Slot()
+	def run(self):
+		module=None
+		spec=None
+		index=-1
+		if self.path.endswith(".py") and os.path.basename(self.path)!='__init__.py':
+			if os.path.dirname(self.path) not in sys.path:
+				sys.path.append( os.path.dirname(self.path))
+			modName=os.path.basename(self.path.replace(".py","")).replace("/",".")
+			try:
+				modpackage=os.path.basename(os.path.dirname(self.path))
+				spec = importlib.util.spec_from_file_location("{}.{}".format(modpackage,modName),self.path,submodule_search_locations=[os.path.dirname(self.path)])
+				module = importlib.util.module_from_spec(spec)
+			except Exception as e:
+				self._debug("Unable to load {0} (perhaps aux lib): {1}".format(module,str(e)))
+				module=None
+				traceback.print_exc()
+		self.queue.put((module,spec))
+	#def run
+#class moduleLoader
+
 class QStackedWindow(QWidget):
 	def __init__(self,*args,**kwargs):
-		parent=kwargs.get("parent")
-		if parent==None:
+		self.parent=kwargs.get("parent")
+		if self.parent==None:
 			for i in args:
 				if isinstance(i,QWidget):
-					parent=i
-		super(QStackedWindow,self).__init__(parent)
-		self.dbg=False
+					self.parent=i
+		super(QStackedWindow,self).__init__(self.parent)
+		self.dbg=True
 		self.current=-1
 		self.referer=-1
 		self.setAttribute(Qt.WA_DeleteOnClose, True)
 		self.lblBanner=QLabel()
-		self.lblPortrait=QWidget()
+		#self.lstPortrait=QListWidget()
+		self.lstPortrait=qtouch.QTableTouchWidget()
 		self.lstNav=QListWidget()
 		self.stkPan=QStackedWidget()
 		self.curStack=None
@@ -47,7 +82,7 @@ class QStackedWindow(QWidget):
 		self.lstNav.itemClicked.connect(self.setCurrentStack)
 		lay.addWidget(self.stkPan,1,1,1,1)
 		lay.setColumnStretch(1,1)
-		lay.addWidget(self.lblPortrait,1,1,1,1,Qt.AlignTop|Qt.AlignLeft)
+		lay.addWidget(self.lstPortrait,1,1,1,1)
 		self.setLayout(lay)
 	#def _renderGui
 
@@ -67,6 +102,7 @@ class QStackedWindow(QWidget):
 				row=cont
 				break
 		return(row)
+	#def _getRowForIdx
 
 	def _endSetCurrentStack(self,idx,oldcursor,parms=None):
 		if self.curStack!=None:
@@ -84,7 +120,7 @@ class QStackedWindow(QWidget):
 		self.stkPan.setCurrentIndex(self.current)
 		self.curStack=self.getCurrentStack()
 		self.setCursor(oldcursor)
-	#def _endSave
+	#def _endSetCurrentStack
 
 	def setCurrentStack(self,*args,**kwargs):
 		self.showPortrait(False)
@@ -143,73 +179,69 @@ class QStackedWindow(QWidget):
 	def addStack(self,stack,**kwargs):
 		callback=kwargs.get("callback",stack.__initScreen__)
 		props=stack.getProps()
+		stack.parent=self
 		icon=QtGui.QIcon.fromTheme(props.get("icon"))
 		self.stkPan.insertWidget(props.get("index"),stack)
 		item=QListWidgetItem(icon,props.get("shortDesc"))
 		item.setToolTip(props.get("tooltip"))
 		idx=props.get("index")
 		item.setData(Qt.UserRole,idx)
+		item.setData(Qt.AccessibleDescriptionRole,props.get("longDesc"))
 		#item.setIcon(icon)
 		self.lstNav.insertItem(idx,item)
 		if props.get("visible",True)==False:
 			item.setHidden(True)
 		callback()
-	#def addStack(self,stack,**kwargs):
-	
-	def _importModuleFromFile(self,fmodule):
-		module=None
-		if fmodule.endswith(".py") and os.path.basename(fmodule)!='__init__.py':
-			sys.path.append( os.path.dirname(fmodule))
-			modName=os.path.basename(fmodule.replace(".py","")).replace("/",".")
-			try:
-				modpackage=os.path.basename(os.path.dirname(fmodule))
-				spec = importlib.util.spec_from_file_location("{}.{}".format(modpackage,modName),fmodule,submodule_search_locations=[os.path.dirname(fmodule)])
-				module = importlib.util.module_from_spec(spec)
-			except Exception as e:
-				self._debug("Unable to load {0} (perhaps aux lib): {1}".format(module,str(e)))
-				module=None
-				traceback.print_exc()
-			try:
-				spec.loader.exec_module(module)
-			except Exception as e:
-				print("ERROR on {}: {}".format(module,e))
-				module=None
-				traceback.print_exc()
-		return(module)
-	#def _importModuleFromFile
+	#def addStack
 
-	def _getClassFromMod(self,module):
+	def _inspectModule(self,module,spec):
+		index=-1
 		moduleClass=None
-		for includedClass in inspect.getmembers(module, predicate=inspect.isclass):
-			name,obj=(includedClass)
-			if name.lower()==module.__name__.split(".")[-1].lower():
-				test=includedClass[1]
-				try:
-					moduleClass=test(parent=self)
-				except Exception as e:
-					self._debug("Unable to import {0}: {1}".format(module,str(e)))
-					traceback.print_exc()
-				else:
-					break
-		if moduleClass!=None:
-			if hasattr(moduleClass,"enabled"):
-				if moduleClass.enabled==False:
-					moduleClass=None
-		return(moduleClass)
-	#def _getClassFromMod
+		try:
+			spec.loader.exec_module(module)
+		except Exception as e:
+			print("ERROR on {}: {}".format(module,e))
+			module=None
+			#traceback.print_exc()
+		if module:
+			for includedClass in inspect.getmembers(module, predicate=inspect.isclass):
+				name,obj=(includedClass)
+				if name.lower()==module.__name__.split(".")[-1].lower():
+					test=includedClass[1]
+					try:
+						moduleClass=test(parent=self)
+					except Exception as e:
+						traceback.print_exc()
+						continue
+					if hasattr(moduleClass,"enabled"):
+						if moduleClass.enabled==False:
+							moduleClass=None
+							continue
+					props=moduleClass.getProps()
+					index=props.get("index",-1)
+		return(index,moduleClass)
+	#def _inspectModule
 
 	def addStacksFromFolder(self,dpath="stacks"):
 		if os.path.isdir(dpath)==False:
 			print("addStacksFromFolder: ./{} not found".format(dpath))
 			return
 		modulesByIndex={}
+		self.queue=Queue()
+		self.threadpool = QThreadPool()
 		for plugin in os.scandir(dpath):
-			module=self._importModuleFromFile(plugin.path)
-			if module!=None:
-				moduleClass=self._getClassFromMod(module)
-				if moduleClass!=None:
-					props=moduleClass.getProps()
-					modulesByIndex[props.get("index",1)]=moduleClass
+			self._debug("Inspecting file {}".format(plugin.path))
+			loader=moduleLoader(plugin.path,self.queue)
+			self.threadpool.start(loader)
+		self.threadpool.waitForDone()
+		while self.queue.empty()==False:
+			moduleClass=None
+			(module,spec)=self.queue.get()
+			(index,moduleClass)=self._inspectModule(module,spec)
+			if moduleClass!=None:
+				if index==-1:
+					index=len(modulesByIndex)
+				modulesByIndex.update({index:moduleClass})
 		for mod in sorted(modulesByIndex.keys()):
 			self.addStack(modulesByIndex[mod])
 		if len(modulesByIndex)<=1:
@@ -219,28 +251,80 @@ class QStackedWindow(QWidget):
 	#def _importStacks(self):
 
 	def _linkStack(self,*args):
-		idx=int(args[0])
+		idx=-1
+		if len(args)>0:
+			if isinstance(args[0],int):
+				idx=args[0]
+			elif isinstance(args[0],str):
+				if args[0].isnumeric()==True:
+					idx=int(args[0])
+			if idx==-1:
+				cRow=self.lstPortrait.currentRow()
+				cCol=self.lstPortrait.currentColumn()
+				idx=(cRow*cCol)+cCol
+		else:
+			idx=self.lstPortrait.currentRow()
 		self.lstNav.setCurrentRow(idx)
 		self.setCurrentStack()
 	#def _linkStack
 
-	def generatePortrait(self):
-		txt=[]
-		lay=QGridLayout()
+	def _fillGrid(self):
+		cols=self.tblGrid.columnCount()
+		curCol=0
 		for idx in range(self.lstNav.count()):
 			item=self.lstNav.item(idx)
-			lbl=QLabel("&nbsp;*&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
+			if curCol==cols or self.lstPortrait.rowCount()==0:
+				curCol=0
+				self.lstPortrait.setRowCount(self.lstPortrait.rowCount()+1)
+				self.lstPortrait.verticalHeader().setSectionResizeMode(self.lstPortrait.rowCount()-1,QHeaderView.ResizeToContent)
+				self.lstPortrait.horizontalHeader().setSectionResizeMode(self.lstPortrait.ColumnCount()-1,QHeaderView.Stretch)
+			btn=qinfo.QPushInfoButton()
+			btn.setText(item.text())
+			icn=item.icon()
+			btn.setIcon(icn)
+			btn.setDescription(item.toolTip())
+			btn.clicked.connect(self._linkStack)
+			#("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,item.toolTip()))
+			self.lstPortrait.setCellWidget(self.lstPortrait.rowCount()-1,curCol,btn)
+			curCol+=1
+	#def _fillGrid(self):
+
+	def _fillList(self):
+		self.lstPortrait.setColumnCount(1)
+		self.lstPortrait.setShowGrid(False)
+		for idx in range(self.lstNav.count()):
+			item=self.lstNav.item(idx)
+			self.lstPortrait.setRowCount(self.lstPortrait.rowCount()+1)
+
+			txt=item.data(Qt.AccessibleDescriptionRole)
+			if len(txt)<=0:
+				txt=item.toolTip()
+			lbl=QLabel("&nbsp;&nbsp;<a href=\"{0}\"><span style=\"font-weight:bold;text-decoration:none\">{1}</span></a>".format(idx,txt))
 			lbl.setTextFormat(Qt.RichText)
 			lbl.setAlignment(Qt.AlignTop)
 			lbl.setTextInteractionFlags(Qt.TextBrowserInteraction)
 			lbl.linkActivated.connect(self._linkStack)
-			lay.addWidget(lbl,lay.rowCount(),0,1,1,Qt.AlignCenter|Qt.AlignLeft)
-		#self.lblPortrait.setText("<br>".join(txt))
-		self.lblPortrait.setLayout(lay)
+			lbl.setAccessibleName(item.text())
+			lbl.setAccessibleDescription(item.toolTip())
+			self.lstPortrait.setCellWidget(self.lstPortrait.rowCount()-1,0,lbl)
+	#def fillList(self):
+
+	def generatePortrait(self,mode="list",cols=1):
+		txt=[]
+		#lay=QGridLayout()
+		self.lstPortrait.setRowCount(0)
+		self.lstPortrait.setColumnCount(3)
+		self.lstPortrait.verticalHeader().hide()
+		self.lstPortrait.horizontalHeader().hide()
+		self.lstPortrait.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+		if mode=="grid":
+			self._fillGrid()
+		else:
+			self._fillList()
 	#def generatePortrait
 
 	def showPortrait(self,show=True):
-		self.lblPortrait.setVisible(show)
+		self.lstPortrait.setVisible(show)
 		self.stkPan.setVisible(not show)
 	#def showPortrait
 			

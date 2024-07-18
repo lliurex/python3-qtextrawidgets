@@ -2,6 +2,8 @@ from PySide2.QtWidgets import QScrollArea,QGridLayout,QLabel,QWidget,QPushButton
 from PySide2.QtGui import QIcon,QColor,QPalette
 from PySide2.QtCore import Qt,Signal,QSize
 
+#Label for notification purposes
+
 class QInfoLabel(QWidget):
 	clicked=Signal()
 	def __init__(self,*args,**kwargs):

@@ -1,7 +1,8 @@
 from PySide2.QtWidgets import QScrollArea,QVBoxLayout,QLabel,QWidget
-from PySide2.QtCore import Qt
+from PySide2.QtCore import Qt,Signal
 
 class QScrollLabel(QScrollArea):
+	linkActivated=Signal("PyObject")
 	def __init__(self,*args,**kwargs):
 		parent = kwargs.get('parent')
 		text = kwargs.get('text',"")
@@ -17,6 +18,7 @@ class QScrollLabel(QScrollArea):
 		lay = QVBoxLayout(content)
 		self.label = QLabel(content)
 		self.label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+		self.label.linkActivated.connect(self._emitLink)
 		self.label.setWordWrap(True)
 		lay.addWidget(self.label)
 		self.label.setText(text)
@@ -24,6 +26,10 @@ class QScrollLabel(QScrollArea):
 #		self.setFixedWidth(self.label.sizeHint().width())
 #		self.setFixedHeight(self.label.sizeHint().height()/2)
 	#def __init__
+
+	def text(self):
+		return(self.label.text())
+	#def text
 
 	def setText(self,text):
 		self.label.setText(text)
@@ -45,4 +51,7 @@ class QScrollLabel(QScrollArea):
 		if self.height()<height-50:
 			self.setFixedHeight(height-50)
 	#def adjustHeight
+
+	def _emitLink(self,*args):
+		self.linkActivated.emit(args)
 #class QScrollLabel
