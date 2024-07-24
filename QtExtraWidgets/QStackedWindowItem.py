@@ -244,10 +244,15 @@ class QStackedWindowItem(QWidget):
 	#def hideControlButtons(self):
 
 	def setChanged(self,state=True,*args):
-		self.btnAccept.setEnabled(state)
-		self.btnCancel.setEnabled(state)
-		self.props["changed"]=state
-		self._debug("New State: {}".format(state))
+		if (self.btnAccept.isVisible() or self.btnCancel.isVisible())==False:
+			return
+		if state!=self.btnAccept.isEnabled():
+			self.btnAccept.setEnabled(state)
+		if state!=self.btnCancel.isEnabled():
+			self.btnCancel.setEnabled(state)
+		if state!=self.props["changed"]:
+			self.props["changed"]=state
+			self._debug("New State: {}".format(state))
 	#def setChanged
 
 	def getChanges(self):
