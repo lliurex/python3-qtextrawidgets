@@ -1,3 +1,10 @@
+python3-qtextrawidgets (0.3.3-0lliurex23) jammy; urgency=medium
+
+  * Improve QScreenShotContainer memory footprint
+  * Align button left on QInfoLabel
+
+ -- Juanma1980 <juanma1980@gmail.com>  Wed, 24 Jul 2024 13:54:14 +0200
+
 python3-qtextrawidgets (0.3.2-0lliurex23) jammy; urgency=medium
 
   * Add text() method to QScrollLabel
