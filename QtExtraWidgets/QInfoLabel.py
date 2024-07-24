@@ -42,7 +42,7 @@ class QInfoLabel(QWidget):
 		self.btnAction=QPushButton("")
 		self.btnAction.setVisible(False)
 		self.btnAction.clicked.connect(self.emitClick)
-		lay.addWidget(self.btnAction,1,1,1,2,Qt.AlignRight)
+		lay.addWidget(self.btnAction,1,1,1,2,Qt.AlignLeft)
 		self.setLayout(lay)
 		bcolor=QColor(QPalette().color(QPalette.Active,QPalette.Highlight))
 		color=QColor(QPalette().color(QPalette.Inactive,QPalette.Highlight))
