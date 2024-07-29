@@ -63,7 +63,6 @@ class QStackedWindow(QWidget):
 		self.lstPortrait=qtouch.QTableTouchWidget()
 		self.lstNav=QListWidget()
 		self.stkPan=QStackedWidget()
-		self.curStack=None
 		self.rsrc="/usr/share/appconfig"
 		self._renderGui()
 		self.showPortrait()
@@ -104,9 +103,7 @@ class QStackedWindow(QWidget):
 		return(row)
 	#def _getRowForIdx
 
-	def _endSetCurrentStack(self,idx,oldcursor,parms=None):
-		if self.curStack!=None:
-			lay=self.layout()
+	def _endSetCurrentStack(self,idx,parms=None):
 		self.referer=self.current
 		if idx<0:
 			idx=self.lstNav.currentRow()
@@ -118,13 +115,12 @@ class QStackedWindow(QWidget):
 			self.stkPan.widget(self.current).setParms(parms)
 			#self.curStack.updateScreen()
 		self.stkPan.setCurrentIndex(self.current)
-		self.curStack=self.getCurrentStack()
-		self.setCursor(oldcursor)
+		self.setCursor(self.oldcursor)
 	#def _endSetCurrentStack
 
 	def setCurrentStack(self,*args,**kwargs):
 		self.showPortrait(False)
-		oldcursor=self.cursor()
+		self.oldcursor=self.cursor()
 		cursor=QtGui.QCursor(Qt.WaitCursor)
 		self.setCursor(cursor)
 		parms=kwargs.get("parms",None)
@@ -141,13 +137,13 @@ class QStackedWindow(QWidget):
 					cont=widget.dlgPendingChanges()
 					if cont<0:
 						self.lstNav.setCurrentRow(self.current)
-						self.setCursor(oldcursor)
+						self.setCursor(self.oldcursor)
 						return
 					elif cont==0:
 						widget.btnAccept.clicked.emit()
-						widget.updated.connect(lambda: self._endSetCurrentStack(idx,oldcursor,parms))
+						widget.updated.connect(lambda: self._endSetCurrentStack(idx,parms))
 						return
-		self._endSetCurrentStack(idx,oldcursor,parms)
+		self._endSetCurrentStack(idx,parms)
 	#def setCurrentStack
 
 	def setIcon(self,ficon):

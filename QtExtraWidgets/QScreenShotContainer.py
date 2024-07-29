@@ -255,5 +255,6 @@ class QScreenShotContainer(QWidget):
 	def _cleanThreads(self):
 		for th in self.th:
 			th.wait()
+		self.th=[]
 	#def _cleanThreads
 #class QScreenShotContainer
