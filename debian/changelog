@@ -1,3 +1,10 @@
+python3-qtextrawidgets (0.3.4-0lliurex23) jammy; urgency=medium
+
+  * Race condition in QStackedWindow: 
+  *  fail getting cursor if there's pending data under heavy workloads
+
+ -- Juanma1980 <juanma1980@gmail.com>  Mon, 29 Jul 2024 23:01:44 +0200
+
 python3-qtextrawidgets (0.3.3-0lliurex23) jammy; urgency=medium
 
   * Improve QScreenShotContainer memory footprint
