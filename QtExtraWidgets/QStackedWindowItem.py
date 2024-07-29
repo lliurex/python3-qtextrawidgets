@@ -130,32 +130,32 @@ class QStackedWindowItem(QWidget):
 		raise NotImplementedError("updateScreen method not implemented in this stack")
 	#def updateScreen
 
-	def _recursiveBlockEvents(self,widget):
+	def _recursiveBlockEvents(self,widget,block=True):
 		if widget==None or widget in [self.btnAccept,self.btnCancel]:
 			return
-		widget.blockSignals(True)
+		widget.blockSignals(block)
 		if isinstance(widget,QTableWidget):
 			for x in range (0,widget.rowCount()):
 				for y in range (0,widget.columnCount()):
 					tableWidget=widget.cellWidget(x,y)
-					self._recursiveBlockEvents(tableWidget)
+					self._recursiveBlockEvents(tableWidget,block)
 		if isinstance(widget,QScrollArea):
 			wdg=widget.widget()
 			if wdg:
-				self._recursiveBlockEvents(wdg)
+				self._recursiveBlockEvents(wdg,block)
 			else:
 				lay=widget.layout()
 				if lay:
-					self._recursiveBlockEvents(lay)
+					self._recursiveBlockEvents(lay,block)
 		else:
 			if type(widget) in [QGridLayout,QVBoxLayout,QHBoxLayout]:
-				self._recursiveSetupEvents(widget,block=True)
+				self._recursiveSetupEvents(widget,block=block)
 			else:
 				try:
 					if widget.layout():
-						self._recursiveSetupEvents(widget.layout(),block=True)
+						self._recursiveSetupEvents(widget.layout(),block=block)
 				except:
-						self._recursiveSetupEvents(widget,block=True)
+						self._recursiveSetupEvents(widget,block=block)
 	#def _recursiveBlockEvents(widget):
 
 	def _getSignalForConnection(self,widget):
@@ -210,18 +210,19 @@ class QStackedWindowItem(QWidget):
 						self._recursiveSetupEvents(widget.layout())
 				except:
 					self._recursiveSetupEvents(widget)
+		return
 	#def _recursiveExploreWidgets(widget):
 
-	def _recursiveSetupEvents(self,layout,block=False):
+	def _recursiveSetupEvents(self,layout,block=None):
 		if layout==None:
 			return
 		for idx in range(0,layout.count()):
 			widget=layout.itemAt(idx).widget()
 			if isinstance(widget,QWidget):
-				if block==False:
+				if block==None:
 					self._recursiveExploreWidgets(widget)
 				else:
-					self._recursiveBlockEvents(widget)
+					self._recursiveBlockEvents(widget,block)
 
 			elif layout.itemAt(idx).layout():
 				self._recursiveSetupEvents(layout.itemAt(idx).layout(),block)
