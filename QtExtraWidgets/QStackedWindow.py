@@ -132,7 +132,7 @@ class QStackedWindow(QWidget):
 					break
 		widget=self.stkPan.currentWidget()
 		if hasattr(widget,"btnAccept"):
-			if widget.btnAccept.isEnabled()==True and widget.btnAccept.isVisible==True:
+			if widget.btnAccept.isEnabled()==True and widget.btnAccept.isVisible()==True:
 				if hasattr(widget,"dlgPendingChanges"):
 					cont=widget.dlgPendingChanges()
 					if cont<0:
