@@ -218,7 +218,8 @@ class QStackedWindowItem(QWidget):
 					if widget.layout():
 						self._recursiveSetupEvents(widget.layout())
 				except:
-					self._recursiveSetupEvents(widget)
+					self._recursiveExploreWidgets(widget)
+				#	self._recursiveSetupEvents(widget)
 		return
 	#def _recursiveExploreWidgets(widget):
 
