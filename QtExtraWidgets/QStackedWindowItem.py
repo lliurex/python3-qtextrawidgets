@@ -46,6 +46,7 @@ class QStackedWindowItem(QWidget):
 		self.btnAccept=QPushButton(_("Apply"))
 		self.btnCancel=QPushButton(_("Undo"))
 		self.btnCancel.clicked.connect(self.updateScreen)
+		self.connectWdgs=[]
 		self.__init_stack__()
 		self.updateScreen=self.decoratorUpdateScreen(self.updateScreen)
 		self.__initScreen__=self.decoratorInitScreen(self.__initScreen__)
@@ -153,7 +154,7 @@ class QStackedWindowItem(QWidget):
 			else:
 				try:
 					if widget.layout():
-						self._recursiveSetupEvents(widget.layout(),block=block)
+						self._recursiveSetupEvents(widget.layout())
 				except:
 						self._recursiveSetupEvents(widget,block=block)
 	#def _recursiveBlockEvents(widget):
@@ -162,23 +163,31 @@ class QStackedWindowItem(QWidget):
 		if isinstance(widget,QCheckBox):
 			#widget.stateChanged.connect(self.setChanged,Qt.UniqueConnection)
 			widget.stateChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		if isinstance(widget,QRadioButton):
 			widget.toggled.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QComboBox):
 			widget.currentTextChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QLineEdit):
 			widget.textChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QSlider):
 			widget.valueChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QCalendarWidget):
 			widget.selectionChanged.connect(lambda: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QPushButton):
 			if widget.menu():
 				widget.menu().triggered.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
 			else:
 				widget.clicked.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif 'dropButton' in str(widget):
 			widget.drop.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QTableWidget):
 			widget.cellChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
 		widget.blockSignals(False)
@@ -218,6 +227,9 @@ class QStackedWindowItem(QWidget):
 			return
 		for idx in range(0,layout.count()):
 			widget=layout.itemAt(idx).widget()
+			if widget!=None:
+				if widget in self.connectWdgs:
+					continue	
 			if isinstance(widget,QWidget):
 				if block==None:
 					self._recursiveExploreWidgets(widget)
