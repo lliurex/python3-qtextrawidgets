@@ -6,7 +6,7 @@ import inspect
 import time
 from queue import Queue
 import traceback
-from PySide2.QtWidgets import QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
+from PySide2.QtWidgets import QApplication,QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
 from QtExtraWidgets import QPushInfoButton as qinfo,QTableTouchWidget as qtouch
@@ -48,12 +48,13 @@ class moduleLoader(QRunnable):
 
 class QStackedWindow(QWidget):
 	def __init__(self,*args,**kwargs):
-		self.parent=kwargs.get("parent")
-		if self.parent==None:
+		self.wparent=kwargs.get("parent")
+		if self.wparent==None:
 			for i in args:
 				if isinstance(i,QWidget):
-					self.parent=i
-		super(QStackedWindow,self).__init__(self.parent)
+					self.wparent=i
+		super(QStackedWindow,self).__init__(self.wparent)
+		self.setParent(self.wparent)
 		self.dbg=True
 		self.current=-1
 		self.referer=-1
@@ -147,11 +148,24 @@ class QStackedWindow(QWidget):
 	#def setCurrentStack
 
 	def setIcon(self,ficon):
-		self._debug("Icon: {}".format(ficon))
+		if isinstance(ficon,str):
+			self._setIconFromPath(ficon)
+		elif isinstance(ficon,QtGui.QIcon):
+			self.setWindowIcon(ficon)
+			super(QStackedWindow,self).setWindowIcon(ficon)
+		elif isinstance(ficon,QtGui.QPixmap):
+			print("Not implemented")
+			pass
+	#def setIcon(self,ficon):
+
+
+	def _setIconFromPath(self,ficon):
+		self._debug("Icon from: {}".format(ficon))
 		if os.path.isfile(ficon):
 			icon=QtGui.QIcon(ficon)
 		else:
 			icon=QtGui.QIcon.fromTheme(ficon)
+		self._debug("Icon: {}".format(icon))
 		self.setWindowIcon(icon)
 	#def setIcon
 
