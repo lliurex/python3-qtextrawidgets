@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import traceback
 from PySide2.QtWidgets import QDialog,QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QLabel,QPushButton,QLineEdit,\
 	QRadioButton,QCheckBox,QComboBox,QTableWidget,QSlider,QScrollArea,QMessageBox,QCalendarWidget
@@ -6,7 +7,6 @@ from PySide2 import QtGui
 #from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import Qt,QUrl,QObject, Slot, Signal, Property,QThread,QSize
 import logging
-import notify2
 import gettext
 try:
 	confText=gettext.translation("python3-appconfig")
@@ -292,16 +292,18 @@ class QStackedWindowItem(QWidget):
 		return(self.props)
 	#def getProps
 
-	def showMsg(self,msg,title='',state=None):
-		self._debug("Sending {}".format(msg))
-		if title=='':
-			title=self.props.get("shortDesc","unknown")
-		try:
-			notify2.init(title)
-			notice = notify2.Notification(msg)
-			notice.show()
-		except:
-			print(msg)
-		return
+	def showMsg(self,**kwargs):
+		if self.parent!=None:
+			if hasattr(self.parent,"showNotification"):
+				notifyIcon=self.props["icon"]
+				if isinstance (kwargs.get("icon",None),str):
+					if os.path.exists(kwargs["icon"]):
+						notifyIcon=kwargs["icon"]
+				self.parent.showNotification(kwargs.get("title",
+												self.props["shortDesc"]),
+												kwargs.get("summary",""),
+												kwargs.get("text",""),
+												notifyIcon,
+												kwargs.get("timeout",0))
 	#def showMsg
 #class QStackedWindowItem

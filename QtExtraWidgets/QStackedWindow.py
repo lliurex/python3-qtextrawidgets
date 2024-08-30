@@ -10,6 +10,7 @@ from PySide2.QtWidgets import QApplication,QLabel, QWidget, QGridLayout,QListWid
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
 from QtExtraWidgets import QPushInfoButton as qinfo,QTableTouchWidget as qtouch
+import notify2
 QString=type("")
 QInt=type(0)
 
@@ -65,6 +66,7 @@ class QStackedWindow(QWidget):
 		self.lstNav=QListWidget()
 		self.stkPan=QStackedWidget()
 		self.rsrc="/usr/share/appconfig"
+		self.notify=notify2
 		self._renderGui()
 		self.showPortrait()
 	#def init
@@ -345,4 +347,16 @@ class QStackedWindow(QWidget):
 		lbl_wiki.setToolTip(url)
 		self.layout().addWidget(lbl_wiki,0,1,Qt.AlignTop|Qt.AlignRight)
 	#def setWiki
+
+	def showNotification(self,title="",summary="",text="",icon="",timeout=0):
+		if self.notify.is_initted()==False:
+			self.notify.init(title)
+		else:
+			self.notify.appname=title
+		self._debug("Sending {}".format(text))
+		notify=self.notify.Notification(summary,text,icon)
+		if timeout>0:
+			notify.timeout=timeout
+		notify.show()
+	#def showNotification
 #class QStackedWindow
