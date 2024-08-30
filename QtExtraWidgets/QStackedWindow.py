@@ -150,16 +150,23 @@ class QStackedWindow(QWidget):
 	#def setCurrentStack
 
 	def setIcon(self,ficon):
+		#Wayland only:
+		# setwindowIcon doesn't works under W
+		# so the standar sais that icon must be getted from .desktop
+		# as a dirty hack the assumption is that a desktop file with the ficon name must exists
+		# ex: "repoman" icon -> net.lliurex.repoman.desktop
+		# so desktop file search could be avoided
+		#IMPORTANT: desktop file must match convention of reverse domain standard (xx.xx.xxxxx.desktop)
 		if isinstance(ficon,str):
 			self._setIconFromPath(ficon)
+			QtGui.QGuiApplication.setDesktopFileName(os.path.basename(ficon))
 		elif isinstance(ficon,QtGui.QIcon):
 			self.setWindowIcon(ficon)
+			QtGui.QGuiApplication.setDesktopFileName(os.path.basename(ficon.name()))
 			super(QStackedWindow,self).setWindowIcon(ficon)
 		elif isinstance(ficon,QtGui.QPixmap):
 			print("Not implemented")
-			pass
 	#def setIcon(self,ficon):
-
 
 	def _setIconFromPath(self,ficon):
 		self._debug("Icon from: {}".format(ficon))
