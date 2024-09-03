@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QScroller,QScrollerProperties,QTableWidget,QWidget,QAbstractItemView
+from PySide6.QtWidgets import QScroller,QScrollerProperties,QTableWidget,QWidget,QAbstractItemView
 
 class QTableTouchWidget(QTableWidget):
 	def __init__(self,*args,**kwargs):

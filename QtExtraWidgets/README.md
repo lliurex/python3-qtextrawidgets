@@ -1,5 +1,5 @@
 #python3-extrawidgets
-This package contains a set of custom pyside2 widgets.
+This package contains a set of custom pyside6 widgets.
 
 ##QCheckableComboBox
 Combobox with checkboxes for items
