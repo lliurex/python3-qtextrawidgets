@@ -23,8 +23,8 @@ from distutils.core import setup
 
 if __name__ == '__main__':
 
-    setup(name='python3-qtextrawidgets',
-        version='0.1',
+    setup(name='QtExtrawidgets',
+        version='0.4',
         description='Some widgets for pySide',
         long_description="""""",
         author='Lliurex Team',
