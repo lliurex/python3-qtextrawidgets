@@ -5,14 +5,15 @@ from PySide2.QtWidgets import QDialog,QWidget,QVBoxLayout,QHBoxLayout,QPushButto
 	QRadioButton,QCheckBox,QComboBox,QTableWidget,QSlider,QScrollArea,QMessageBox,QCalendarWidget
 from PySide2 import QtGui
 #from PySide2.QtWidgets import QApplication
-from PySide2.QtCore import Qt,QUrl,QObject, Slot, Signal, Property,QThread,QSize
+from PySide2.QtCore import Qt,QUrl,QObject, Slot, Signal, Property,QThread,QSize,QTimer
+from QtExtraWidgets.QInfoLabel import QInfoLabel
 import logging
 import gettext
 try:
-	confText=gettext.translation("python3-appconfig")
+	confText=gettext.translation("python3-qtextrawidgets")
 	_ = confText.gettext
 except:
-	gettext.textdomain('python3-appconfig')
+	gettext.textdomain('python3-qtextrawidgets')
 	_ = gettext.gettext
 #_ = nullTrans.gettext
 
@@ -39,13 +40,12 @@ class QStackedWindowItem(QWidget):
 		}
 		self.changes=False
 		self.level='user'
-		self.changes=False
-		self.refresh=False
 		#self.stack=stack
-		self.textdomain='python3-appconfig'
+		self.textdomain='python3-qtextrawiggets'
 		self.btnAccept=QPushButton(_("Apply"))
 		self.btnCancel=QPushButton(_("Undo"))
 		self.btnCancel.clicked.connect(self.updateScreen)
+		self.statusMsg=QInfoLabel()
 		self.connectWdgs=[]
 		self.__init_stack__()
 		self.updateScreen=self.decoratorUpdateScreen(self.updateScreen)
@@ -93,7 +93,9 @@ class QStackedWindowItem(QWidget):
 			if layout:
 				self._recursiveSetupEvents(layout)
 				box_btns=QHBoxLayout()
-				box_btns.insertStretch(0)
+				box_btns.addWidget(self.statusMsg)
+				self.statusMsg.setVisible(False)
+				box_btns.insertStretch(1)
 				box_btns.addWidget(self.btnAccept)
 				box_btns.addWidget(self.btnCancel)
 				if isinstance(layout,QGridLayout):
@@ -292,7 +294,25 @@ class QStackedWindowItem(QWidget):
 		return(self.props)
 	#def getProps
 
-	def showMsg(self,**kwargs):
+	def showMsg(self,*args,**kwargs):
+		text=""
+		timeout=0
+		if len(args)>0:
+			for arg in args:
+				if isinstance(a,str) and text=="":
+					text=arg
+				if isinstance(a,int) and timeout==0:
+					timeout=arg
+		if kwargs.get("text","")!="":
+			text=kwargs["text"]
+		if kwargs.get("timeout",0)!=0:
+			timeout=kwargs["timeout"]
+		self.statusMsg.setText(text)
+		self.statusMsg.setTimeout(timeout)
+		self.statusMsg.setVisible(True)
+	#def showMsg
+
+	def sendNotify(self,**kwargs):
 		if self.parent!=None:
 			if hasattr(self.parent,"showNotification"):
 				notifyIcon=self.props["icon"]
