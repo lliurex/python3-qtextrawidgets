@@ -1,6 +1,7 @@
-python3-qtextrawidgets (0.4.0-0lliurex25) noble; urgency=medium
+python3-qtextrawidgets (0.4.1-0lliurex25) noble; urgency=medium
 
   * Noble release
+  * QInfoLabel: hide timeout
 
  -- Juanma1980 <juanma1980@gmail.com>  Tue, 03 Sep 2024 11:53:34 +0200
 
