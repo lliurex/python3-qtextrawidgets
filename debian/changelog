@@ -3,6 +3,7 @@ python3-qtextrawidgets (0.4.1-0lliurex25) noble; urgency=medium
   * Noble release
   * QInfoLabel
   *   hide timeout
+  *   MSG summary
   * QStackedWindowItem 
   *   Add statusbar msg 
 
