@@ -307,6 +307,8 @@ class QStackedWindowItem(QWidget):
 			text=kwargs["text"]
 		if kwargs.get("timeout",0)!=0:
 			timeout=kwargs["timeout"]
+		if kwargs.get("summary","")!="":
+			text="<STRONG>{0}</STRONG><br>{1}".format(kwargs["summary"],text)
 		self.statusMsg.setText(text)
 		self.statusMsg.setTimeout(timeout)
 		self.statusMsg.setVisible(True)
