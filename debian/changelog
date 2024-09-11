@@ -1,0 +1,70 @@
+python3-qtextrawidgets (0.4.0-0lliurex23) jammy; urgency=medium
+
+  * Full wayland support
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 30 Aug 2024 11:03:35 +0200
+
+python3-qtextrawidgets (0.3.4-0lliurex23) jammy; urgency=medium
+
+  * QStackedWindow: 
+  *  fail getting cursor if there's pending data under heavy workloads
+  *  Improve signal management
+
+ -- Juanma1980 <juanma1980@gmail.com>  Mon, 29 Jul 2024 23:01:44 +0200
+
+python3-qtextrawidgets (0.3.3-0lliurex23) jammy; urgency=medium
+
+  * Improve QScreenShotContainer memory footprint
+  * Align button left on QInfoLabel
+
+ -- Juanma1980 <juanma1980@gmail.com>  Wed, 24 Jul 2024 13:54:14 +0200
+
+python3-qtextrawidgets (0.3.2-0lliurex23) jammy; urgency=medium
+
+  * Add text() method to QScrollLabel
+  * FIX QScreenShotContainer when no images to show
+
+ -- Juanma1980 <juanma1980@gmail.com>  Mon, 08 Jul 2024 10:27:39 +0200
+
+python3-qtextrawidgets (0.3.1-1lliurex23) jammy; urgency=medium
+
+  * Add debug mode for qscreenshotcontainer
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 05 Jul 2024 10:51:56 +0200
+
+python3-qtextrawidgets (0.3.1-0lliurex23) jammy; urgency=medium
+
+  * QStackWindow: Ignore stack data if it's disabled
+
+ -- Juanma1980 <juanma1980@gmail.com>  Thu, 16 May 2024 17:43:40 +0200
+
+python3-qtextrawidgets (0.3.0-0lliurex23) jammy; urgency=medium
+
+  * QStackWindow: Portrait in grid or list mode
+  * QHotkeyButton: Show "push me" text when clicked
+  * WIP on accessibility
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 03 May 2024 09:34:04 +0200
+
+python3-qtextrawidgets (0.2.2-0lliurex23) jammy; urgency=medium
+
+  * Use qthreads for importing stacks in QStackedWindow
+  * Add QInfoPushButton
+
+ -- Juanma1980 <juanma1980@gmail.com>  Thu, 11 Apr 2024 12:56:52 +0200
+
+python3-qtextrawidgets (0.2.1-0lliurex23) jammy; urgency=medium
+
+  * Remove gettext from qstackedwindow
+  * Use Qlist for portrait on qstackedwindow
+
+ -- Juanma1980 <juanma1980@gmail.com>  Wed, 21 Feb 2024 11:03:22 +0100
+
+python3-qtextrawidgets (0.1) jammy; urgency=medium
+
+  * First release
+  *  QCheckableComboBox,QHotkeyButton,QInfoLabel,QScreenShotContainer,QScrollLabel
+  *  QSearchBox,QStackedWindowItem,QStackedWindow,QTableTouchWidget
+
+ -- Juanma1980 <juanma1980@gmail.com>  Tue, 16 Jan 2024 12:10:44 +0100
+
