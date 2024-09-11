@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from . import QCheckableComboBox as _QCheckableComboBox
 from . import QHotkeyButton as _QHotkeyButton
 from . import QInfoLabel as _QInfoLabel
