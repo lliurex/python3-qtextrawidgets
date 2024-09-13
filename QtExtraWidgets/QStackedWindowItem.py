@@ -317,8 +317,6 @@ class QStackedWindowItem(QWidget):
 			text="<STRONG>{0}</STRONG><br>{1}".format(kwargs["summary"],text)
 		self.statusMsg.setText(text)
 		self.statusMsg.setTimeout(timeout)
-		if self.btnAccept.isVisible()==False:
-			self.statusMsg.y=-100
 		self.statusMsg.setVisible(True)
 	#def showMsg
 
