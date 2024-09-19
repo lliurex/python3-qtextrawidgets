@@ -2,7 +2,7 @@ from PySide2.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QHBoxLayou
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal,QEvent,QThread,QSize
 from . import QTableTouchWidget
-import os,hashlib,requests
+import os,requests
 
 class _loadScreenShot(QThread):
 	imageLoaded=Signal("PyObject")
@@ -49,12 +49,15 @@ class _loadScreenShot(QThread):
 
 	def run(self,*args):
 		img=None
-		md5Name=""
-		md5Name=hashlib.md5(self.img.encode())
+		stripName=''.join(ch for ch in self.img if ch.isalnum())
+		MAX=96
+		if (len(stripName)-96>0):
+			stripName=stripName[len(stripName)-96:]
 		icn=QtGui.QIcon.fromTheme("image-x-generic")
 		pxm=icn.pixmap(512,512)
+		fPath=""
 		if self.cacheDir:
-			fPath=os.path.join(self.cacheDir,str(md5Name.hexdigest()))#self.img.split('/')[-1])
+			fPath=os.path.join(self.cacheDir,stripName)#self.img.split('/')[-1])
 			if os.path.isfile(fPath)==True:
 				pxm=QtGui.QPixmap()
 				try:
@@ -71,8 +74,9 @@ class _loadScreenShot(QThread):
 				print("request: {}".format(e))
 		if img:
 			if self.cacheDir:
-				fPath=os.path.join(self.cacheDir,str(md5Name.hexdigest()))
-				if os.path.exists(fPath)==False:
+				if fPath=="":
+					fPath=os.path.join(self.cacheDir,stripName)
+				if not os.path.exists(fPath):
 					pxm=pxm.scaled(256,256,Qt.AspectRatioMode.KeepAspectRatio,Qt.TransformationMode.SmoothTransformation)
 					p=pxm.save(fPath,"PNG")#,quality=5)
 		self.imageLoaded.emit(pxm)
@@ -156,6 +160,9 @@ class QScreenShotContainer(QWidget):
 		selectedImg=""
 		arrayImg=[]
 		for btnImg,img in self.btnImg.items():
+			print(type(btnImg))
+			if isinstance(btnImg,QPushButton)==False:
+				continue
 			lbl=QLabel()
 			lbl.setPixmap(img.scaled(xSize,ySize,Qt.AspectRatioMode.KeepAspectRatio,Qt.TransformationMode.SmoothTransformation))
 			if btnImg==btn:	
@@ -227,15 +234,15 @@ class QScreenShotContainer(QWidget):
 		img=args[0]
 		if isinstance(img,QtGui.QPixmap):
 			if img.isNull()==False:
-				btnImg=QPushButton()
-				self.lay.addWidget(btnImg)
-				self.btnImg[btnImg]=img
+				self.btnImg["btn"]=QPushButton()
+				self.btnImg[self.btnImg["btn"]]=img
+				self.lay.addWidget(self.btnImg["btn"])
 				icn=QtGui.QIcon(img)
-				btnImg.setIcon(icn)
-				btnImg.setIconSize(QSize(128,128))
-				self.scroll.setFixedHeight(btnImg.sizeHint().height()+32)
-				btnImg.installEventFilter(self)
-				btnImg.show()
+				self.btnImg["btn"].setIcon(icn)
+				self.btnImg["btn"].setIconSize(QSize(128,128))
+				self.scroll.setFixedHeight(self.btnImg["btn"].sizeHint().height()+32)
+				self.btnImg["btn"].installEventFilter(self)
+				self.btnImg["btn"].show()
 	#def load
 
 	def clear(self):
@@ -248,5 +255,6 @@ class QScreenShotContainer(QWidget):
 	def _cleanThreads(self):
 		for th in self.th:
 			th.wait()
+		self.th=[]
 	#def _cleanThreads
 #class QScreenShotContainer

@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QComboBox
+from PySide2.QtWidgets import QComboBox,QSizePolicy
 from PySide2.QtGui import QStandardItemModel
 from PySide2.QtCore import Qt,Signal
 
@@ -13,6 +13,8 @@ class QCheckableComboBox(QComboBox):
 					parent = i
 		super().__init__(*args,**kwargs)
 		self.view().pressed.connect(self._checked)
+		self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Preferred)
+		self.setSizeAdjustPolicy(self.SizeAdjustPolicy.AdjustToContents)
 		self.setModel(QStandardItemModel(self))
 		self.checked=False
 		self.addItem("")
@@ -55,6 +57,7 @@ class QCheckableComboBox(QComboBox):
 				item.setCheckState(Qt.Checked)
 			else:
 				item.setCheckState(Qt.Unchecked)
+		self.setMinimumWidth(self.view().sizeHint().width())
 	#	rect=self.view().sizeHint()
 	#	Xpos=0
 	#	Ypos=rect.height()

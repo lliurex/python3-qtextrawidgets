@@ -6,10 +6,11 @@ import inspect
 import time
 from queue import Queue
 import traceback
-from PySide2.QtWidgets import QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
+from PySide2.QtWidgets import QApplication,QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
 from QtExtraWidgets import QPushInfoButton as qinfo,QTableTouchWidget as qtouch
+import notify2
 QString=type("")
 QInt=type(0)
 
@@ -48,12 +49,13 @@ class moduleLoader(QRunnable):
 
 class QStackedWindow(QWidget):
 	def __init__(self,*args,**kwargs):
-		self.parent=kwargs.get("parent")
-		if self.parent==None:
+		self.wparent=kwargs.get("parent")
+		if self.wparent==None:
 			for i in args:
 				if isinstance(i,QWidget):
-					self.parent=i
-		super(QStackedWindow,self).__init__(self.parent)
+					self.wparent=i
+		super(QStackedWindow,self).__init__(self.wparent)
+		self.setParent(self.wparent)
 		self.dbg=True
 		self.current=-1
 		self.referer=-1
@@ -63,8 +65,8 @@ class QStackedWindow(QWidget):
 		self.lstPortrait=qtouch.QTableTouchWidget()
 		self.lstNav=QListWidget()
 		self.stkPan=QStackedWidget()
-		self.curStack=None
 		self.rsrc="/usr/share/appconfig"
+		self.notify=notify2
 		self._renderGui()
 		self.showPortrait()
 	#def init
@@ -104,9 +106,7 @@ class QStackedWindow(QWidget):
 		return(row)
 	#def _getRowForIdx
 
-	def _endSetCurrentStack(self,idx,oldcursor,parms=None):
-		if self.curStack!=None:
-			lay=self.layout()
+	def _endSetCurrentStack(self,idx,parms=None):
 		self.referer=self.current
 		if idx<0:
 			idx=self.lstNav.currentRow()
@@ -118,13 +118,12 @@ class QStackedWindow(QWidget):
 			self.stkPan.widget(self.current).setParms(parms)
 			#self.curStack.updateScreen()
 		self.stkPan.setCurrentIndex(self.current)
-		self.curStack=self.getCurrentStack()
-		self.setCursor(oldcursor)
+		self.setCursor(self.oldcursor)
 	#def _endSetCurrentStack
 
 	def setCurrentStack(self,*args,**kwargs):
 		self.showPortrait(False)
-		oldcursor=self.cursor()
+		self.oldcursor=self.cursor()
 		cursor=QtGui.QCursor(Qt.WaitCursor)
 		self.setCursor(cursor)
 		parms=kwargs.get("parms",None)
@@ -136,26 +135,46 @@ class QStackedWindow(QWidget):
 					break
 		widget=self.stkPan.currentWidget()
 		if hasattr(widget,"btnAccept"):
-			if widget.btnAccept.isEnabled()==True and widget.btnAccept.isVisible==True:
+			if widget.btnAccept.isEnabled()==True and widget.btnAccept.isVisible()==True:
 				if hasattr(widget,"dlgPendingChanges"):
 					cont=widget.dlgPendingChanges()
 					if cont<0:
 						self.lstNav.setCurrentRow(self.current)
-						self.setCursor(oldcursor)
+						self.setCursor(self.oldcursor)
 						return
 					elif cont==0:
 						widget.btnAccept.clicked.emit()
-						widget.updated.connect(lambda: self._endSetCurrentStack(idx,oldcursor,parms))
+						widget.updated.connect(lambda: self._endSetCurrentStack(idx,parms))
 						return
-		self._endSetCurrentStack(idx,oldcursor,parms)
+		self._endSetCurrentStack(idx,parms)
 	#def setCurrentStack
 
 	def setIcon(self,ficon):
-		self._debug("Icon: {}".format(ficon))
+		#Wayland only:
+		# setwindowIcon doesn't works under W
+		# so the standar sais that icon must be getted from .desktop
+		# as a dirty hack the assumption is that a desktop file with the ficon name must exists
+		# ex: "repoman" icon -> net.lliurex.repoman.desktop
+		# so desktop file search could be avoided
+		#IMPORTANT: desktop file must match convention of reverse domain standard (xx.xx.xxxxx.desktop)
+		if isinstance(ficon,str):
+			self._setIconFromPath(ficon)
+			QtGui.QGuiApplication.setDesktopFileName(os.path.basename(ficon))
+		elif isinstance(ficon,QtGui.QIcon):
+			self.setWindowIcon(ficon)
+			QtGui.QGuiApplication.setDesktopFileName(os.path.basename(ficon.name()))
+			super(QStackedWindow,self).setWindowIcon(ficon)
+		elif isinstance(ficon,QtGui.QPixmap):
+			print("Not implemented")
+	#def setIcon(self,ficon):
+
+	def _setIconFromPath(self,ficon):
+		self._debug("Icon from: {}".format(ficon))
 		if os.path.isfile(ficon):
 			icon=QtGui.QIcon(ficon)
 		else:
 			icon=QtGui.QIcon.fromTheme(ficon)
+		self._debug("Icon: {}".format(icon))
 		self.setWindowIcon(icon)
 	#def setIcon
 
@@ -335,4 +354,16 @@ class QStackedWindow(QWidget):
 		lbl_wiki.setToolTip(url)
 		self.layout().addWidget(lbl_wiki,0,1,Qt.AlignTop|Qt.AlignRight)
 	#def setWiki
+
+	def showNotification(self,title="",summary="",text="",icon="",timeout=0):
+		if self.notify.is_initted()==False:
+			self.notify.init(title)
+		else:
+			self.notify.appname=title
+		self._debug("Sending {}".format(text))
+		notify=self.notify.Notification(summary,text,icon)
+		if timeout>0:
+			notify.timeout=timeout
+		notify.show()
+	#def showNotification
 #class QStackedWindow

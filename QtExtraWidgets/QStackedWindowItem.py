@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
+import os
 import traceback
 from PySide2.QtWidgets import QDialog,QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QLabel,QPushButton,QLineEdit,\
 	QRadioButton,QCheckBox,QComboBox,QTableWidget,QSlider,QScrollArea,QMessageBox,QCalendarWidget
 from PySide2 import QtGui
 #from PySide2.QtWidgets import QApplication
-from PySide2.QtCore import Qt,QUrl,QObject, Slot, Signal, Property,QThread,QSize
+from PySide2.QtCore import Qt,QUrl,QObject, Slot, Signal, Property,QThread,QSize,QTimer
+from QtExtraWidgets.QInfoLabel import QInfoLabel
 import logging
-import notify2
 import gettext
 try:
-	confText=gettext.translation("python3-appconfig")
+	confText=gettext.translation("python3-qtextrawidgets")
 	_ = confText.gettext
 except:
-	gettext.textdomain('python3-appconfig')
+	gettext.textdomain('python3-qtextrawidgets')
 	_ = gettext.gettext
 #_ = nullTrans.gettext
 
@@ -39,13 +40,13 @@ class QStackedWindowItem(QWidget):
 		}
 		self.changes=False
 		self.level='user'
-		self.changes=False
-		self.refresh=False
 		#self.stack=stack
-		self.textdomain='python3-appconfig'
+		self.textdomain='python3-qtextrawiggets'
 		self.btnAccept=QPushButton(_("Apply"))
 		self.btnCancel=QPushButton(_("Undo"))
 		self.btnCancel.clicked.connect(self.updateScreen)
+		self.statusMsg=QInfoLabel()
+		self.connectWdgs=[]
 		self.__init_stack__()
 		self.updateScreen=self.decoratorUpdateScreen(self.updateScreen)
 		self.__initScreen__=self.decoratorInitScreen(self.__initScreen__)
@@ -92,11 +93,18 @@ class QStackedWindowItem(QWidget):
 			if layout:
 				self._recursiveSetupEvents(layout)
 				box_btns=QHBoxLayout()
-				box_btns.insertStretch(0)
+				box_btns.addWidget(self.statusMsg)
+				self.statusMsg.setVisible(False)
+				box_btns.insertStretch(1)
 				box_btns.addWidget(self.btnAccept)
 				box_btns.addWidget(self.btnCancel)
+				idx=layout.rowCount()
+				align=Qt.AlignBottom|Qt.AlignRight
+				if self.btnAccept.isEnabled()==False:
+					idx=0
+					align=Qt.AlignTop|Qt.AlignRight
 				if isinstance(layout,QGridLayout):
-					layout.addLayout(box_btns,layout.rowCount(),0,1,layout.columnCount(),Qt.AlignBottom|Qt.AlignRight)
+					layout.addLayout(box_btns,idx,0,1,layout.columnCount(),align)
 				elif isinstance(layout,QVBoxLayout) or isinstance(layout,QHBoxLayout):
 					layout.addLayout(box_btns,Qt.AlignBottom|Qt.AlignRight)
 		return (states)
@@ -130,55 +138,63 @@ class QStackedWindowItem(QWidget):
 		raise NotImplementedError("updateScreen method not implemented in this stack")
 	#def updateScreen
 
-	def _recursiveBlockEvents(self,widget):
+	def _recursiveBlockEvents(self,widget,block=True):
 		if widget==None or widget in [self.btnAccept,self.btnCancel]:
 			return
-		widget.blockSignals(True)
+		widget.blockSignals(block)
 		if isinstance(widget,QTableWidget):
 			for x in range (0,widget.rowCount()):
 				for y in range (0,widget.columnCount()):
 					tableWidget=widget.cellWidget(x,y)
-					self._recursiveBlockEvents(tableWidget)
+					self._recursiveBlockEvents(tableWidget,block)
 		if isinstance(widget,QScrollArea):
 			wdg=widget.widget()
 			if wdg:
-				self._recursiveBlockEvents(wdg)
+				self._recursiveBlockEvents(wdg,block)
 			else:
 				lay=widget.layout()
 				if lay:
-					self._recursiveBlockEvents(lay)
+					self._recursiveBlockEvents(lay,block)
 		else:
 			if type(widget) in [QGridLayout,QVBoxLayout,QHBoxLayout]:
-				self._recursiveSetupEvents(widget,block=True)
+				self._recursiveSetupEvents(widget,block=block)
 			else:
 				try:
 					if widget.layout():
-						self._recursiveSetupEvents(widget.layout(),block=True)
+						self._recursiveSetupEvents(widget.layout())
 				except:
-						self._recursiveSetupEvents(widget,block=True)
+						self._recursiveSetupEvents(widget,block=block)
 	#def _recursiveBlockEvents(widget):
 
 	def _getSignalForConnection(self,widget):
 		if isinstance(widget,QCheckBox):
 			#widget.stateChanged.connect(self.setChanged,Qt.UniqueConnection)
 			widget.stateChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		if isinstance(widget,QRadioButton):
 			widget.toggled.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QComboBox):
 			widget.currentTextChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QLineEdit):
 			widget.textChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QSlider):
 			widget.valueChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QCalendarWidget):
 			widget.selectionChanged.connect(lambda: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QPushButton):
 			if widget.menu():
 				widget.menu().triggered.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
 			else:
 				widget.clicked.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif 'dropButton' in str(widget):
 			widget.drop.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			self.connectWdgs.append(widget)
 		elif isinstance(widget,QTableWidget):
 			widget.cellChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
 		widget.blockSignals(False)
@@ -209,19 +225,24 @@ class QStackedWindowItem(QWidget):
 					if widget.layout():
 						self._recursiveSetupEvents(widget.layout())
 				except:
-					self._recursiveSetupEvents(widget)
+					self._recursiveExploreWidgets(widget)
+				#	self._recursiveSetupEvents(widget)
+		return
 	#def _recursiveExploreWidgets(widget):
 
-	def _recursiveSetupEvents(self,layout,block=False):
+	def _recursiveSetupEvents(self,layout,block=None):
 		if layout==None:
 			return
 		for idx in range(0,layout.count()):
 			widget=layout.itemAt(idx).widget()
+			if widget!=None:
+				if widget in self.connectWdgs:
+					continue	
 			if isinstance(widget,QWidget):
-				if block==False:
+				if block==None:
 					self._recursiveExploreWidgets(widget)
 				else:
-					self._recursiveBlockEvents(widget)
+					self._recursiveBlockEvents(widget,block)
 
 			elif layout.itemAt(idx).layout():
 				self._recursiveSetupEvents(layout.itemAt(idx).layout(),block)
@@ -240,14 +261,20 @@ class QStackedWindowItem(QWidget):
 
 	def hideControlButtons(self):
 		self.btnAccept.hide()
+		self.btnAccept.setEnabled(False)
 		self.btnCancel.hide()
 	#def hideControlButtons(self):
 
 	def setChanged(self,state=True,*args):
-		self.btnAccept.setEnabled(state)
-		self.btnCancel.setEnabled(state)
-		self.props["changed"]=state
-		self._debug("New State: {}".format(state))
+		if (self.btnAccept.isVisible() or self.btnCancel.isVisible())==False:
+			return
+		if state!=self.btnAccept.isEnabled():
+			self.btnAccept.setEnabled(state)
+		if state!=self.btnCancel.isEnabled():
+			self.btnCancel.setEnabled(state)
+		if state!=self.props["changed"]:
+			self.props["changed"]=state
+			self._debug("New State: {}".format(state))
 	#def setChanged
 
 	def getChanges(self):
@@ -273,16 +300,42 @@ class QStackedWindowItem(QWidget):
 		return(self.props)
 	#def getProps
 
-	def showMsg(self,msg,title='',state=None):
-		self._debug("Sending {}".format(msg))
-		if title=='':
-			title=self.props.get("shortDesc","unknown")
-		try:
-			notify2.init(title)
-			notice = notify2.Notification(msg)
-			notice.show()
-		except:
-			print(msg)
-		return
+	def showMsg(self,*args,**kwargs):
+		text=""
+		timeout=0
+		if len(args)>0:
+			for arg in args:
+				if isinstance(a,str) and text=="":
+					text=arg
+				if isinstance(a,int) and timeout==0:
+					timeout=arg
+		if kwargs.get("text","")!="":
+			text=kwargs["text"]
+		if kwargs.get("timeout",0)!=0:
+			timeout=kwargs["timeout"]
+		if kwargs.get("summary","")!="":
+			text="<STRONG>{0}</STRONG><br>{1}".format(kwargs["summary"],text)
+		self.statusMsg.setText(text)
+		self.statusMsg.setTimeout(timeout)
+		self.statusMsg.setVisible(True)
+	#def showMsg
+
+	def hideMsg(self):
+		self.statusMsg.setVisible(False)
+	#def hideMsg
+
+	def sendNotify(self,**kwargs):
+		if self.parent!=None:
+			if hasattr(self.parent,"showNotification"):
+				notifyIcon=self.props["icon"]
+				if isinstance (kwargs.get("icon",None),str):
+					if os.path.exists(kwargs["icon"]):
+						notifyIcon=kwargs["icon"]
+				self.parent.showNotification(kwargs.get("title",
+												self.props["shortDesc"]),
+												kwargs.get("summary",""),
+												kwargs.get("text",""),
+												notifyIcon,
+												kwargs.get("timeout",0))
 	#def showMsg
 #class QStackedWindowItem
