@@ -11,5 +11,5 @@
 export PYBUILD_NAME=python3-qtextrawidgets
 
 %:
-	dh $@ --with python3 --buildsystem pybuild --system pybuild
+	dh $@ --with python3 --buildsystem pybuild
 
