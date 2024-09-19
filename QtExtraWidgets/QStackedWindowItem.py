@@ -98,8 +98,13 @@ class QStackedWindowItem(QWidget):
 				box_btns.insertStretch(1)
 				box_btns.addWidget(self.btnAccept)
 				box_btns.addWidget(self.btnCancel)
+				idx=layout.rowCount()
+				align=Qt.AlignBottom|Qt.AlignRight
+				if self.btnAccept.isEnabled()==False:
+					idx=0
+					align=Qt.AlignTop|Qt.AlignRight
 				if isinstance(layout,QGridLayout):
-					layout.addLayout(box_btns,layout.rowCount(),0,1,layout.columnCount(),Qt.AlignBottom|Qt.AlignRight)
+					layout.addLayout(box_btns,idx,0,1,layout.columnCount(),align)
 				elif isinstance(layout,QVBoxLayout) or isinstance(layout,QHBoxLayout):
 					layout.addLayout(box_btns,Qt.AlignBottom|Qt.AlignRight)
 		return (states)
@@ -256,6 +261,7 @@ class QStackedWindowItem(QWidget):
 
 	def hideControlButtons(self):
 		self.btnAccept.hide()
+		self.btnAccept.setEnabled(False)
 		self.btnCancel.hide()
 	#def hideControlButtons(self):
 
@@ -313,6 +319,10 @@ class QStackedWindowItem(QWidget):
 		self.statusMsg.setTimeout(timeout)
 		self.statusMsg.setVisible(True)
 	#def showMsg
+
+	def hideMsg(self):
+		self.statusMsg.setVisible(False)
+	#def hideMsg
 
 	def sendNotify(self,**kwargs):
 		if self.parent!=None:
