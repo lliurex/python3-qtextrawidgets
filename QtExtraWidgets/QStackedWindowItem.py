@@ -98,13 +98,14 @@ class QStackedWindowItem(QWidget):
 				box_btns.insertStretch(1)
 				box_btns.addWidget(self.btnAccept)
 				box_btns.addWidget(self.btnCancel)
-				idx=layout.rowCount()
+				if isinstance(layout,QGridLayout):
+					idx=layout.rowCount()
 				align=Qt.AlignBottom|Qt.AlignRight
 				if self.btnAccept.isEnabled()==False:
 					idx=0
-					align=Qt.AlignTop|Qt.AlignRight
+				print(self.btnAccept.isEnabled())
 				if isinstance(layout,QGridLayout):
-					layout.addLayout(box_btns,idx,0,1,layout.columnCount(),align)
+					layout.addLayout(box_btns,idx,0,1,layout.columnCount(),Qt.AlignTop|Qt.AlignRight)
 				elif isinstance(layout,QVBoxLayout) or isinstance(layout,QHBoxLayout):
 					layout.addLayout(box_btns,Qt.AlignBottom|Qt.AlignRight)
 		return (states)
