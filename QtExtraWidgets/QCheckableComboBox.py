@@ -1,6 +1,6 @@
-from PySide2.QtWidgets import QComboBox,QSizePolicy
-from PySide2.QtGui import QStandardItemModel
-from PySide2.QtCore import Qt,Signal
+from PySide6.QtWidgets import QComboBox,QSizePolicy
+from PySide6.QtGui import QStandardItemModel
+from PySide6.QtCore import Qt,Signal
 
 class QCheckableComboBox(QComboBox):
 	clicked=Signal()
