@@ -1,6 +1,7 @@
 import os
 from PySide6.QtWidgets import QPushButton,QWidget
 from PySide6.QtCore import Qt,Signal,QEvent
+from PySide6.QtGui import QKeySequence
 
 class QHotkeyButton(QPushButton):
 	keybind_signal=Signal("PyObject")
@@ -19,20 +20,28 @@ class QHotkeyButton(QPushButton):
 		self.alternate=kwargs.get('alternate',"")
 		self.installEventFilter(self)
 		self.keymap={}
-		for key,value in vars(Qt).items():
-			if isinstance(value, Qt.Key):
-				self.keymap[value]=key.partition('_')[2]
-		self.modmap={
-					Qt.ControlModifier: self.keymap[Qt.Key_Control],
-					Qt.AltModifier: self.keymap[Qt.Key_Alt],
-					Qt.ShiftModifier: self.keymap[Qt.Key_Shift],
-					Qt.MetaModifier: self.keymap[Qt.Key_Meta],
-					Qt.GroupSwitchModifier: self.keymap[Qt.Key_AltGr],
-					Qt.KeypadModifier: self.keymap[Qt.Key_NumLock]
+#		for key,value in vars(Qt).items():
+#			if key=="Key":
+#				print(value)
+#				self.keymap[value]=key.partition('_')[2]
+#		print("****")
+#		print(self.keymap)
+#		print("****")
+		self.keymap={
+					Qt.KeyboardModifier.ControlModifier: "Control",
+					Qt.KeyboardModifier.AltModifier: "Alt",
+					Qt.KeyboardModifier.ShiftModifier: "Shift",
+					Qt.KeyboardModifier.MetaModifier: "Meta",
+					Qt.KeyboardModifier.GroupSwitchModifier: "AltGr",
+					Qt.KeyboardModifier.KeypadModifier: "NumLock"
 					}
 		self.processed=False
 		self.setText(text)
 		self.originalText=text
+		self.setAttribute(Qt.WA_KeyCompression,False)
+		self.sw_mod=False
+		self.keypressed=0
+		self.seq=[]
 	#def __init__
 
 	def setIconSize(self,*args):
@@ -47,22 +56,27 @@ class QHotkeyButton(QPushButton):
 	#def mousePressEvent
 
 	def eventFilter(self,source,event):
-		sw_mod=False
-		keypressed=[]
 		if (event.type()==QEvent.KeyPress):
-			for modifier,text in self.modmap.items():
-				if event.modifiers() & modifier:
-					sw_mod=True
-					keypressed.append(text)
-			key=self.keymap.get(event.key(),event.text())
-			if key not in keypressed:
-				if sw_mod==True:
-					sw_mod=False
-				keypressed.append(key)
-			if sw_mod==False:
-				self.keybind_signal.emit("+".join(keypressed))
+			if event.key() not in self.seq:
+				self.seq.append(event.key())
+			self.keypressed=len(self.seq)
 		if (event.type()==QEvent.KeyRelease):
+			self.keypressed-=1
+			if self.keypressed>0:
+				return(False)
+			if len(self.seq)>2:
+				seq=QKeySequence(self.seq[0],self.seq[1],self.seq[2])
+			elif len(self.seq)>1:
+				seq=QKeySequence(self.seq[0],self.seq[1])
+			else:
+				seq=QKeySequence(self.seq[0])
+			if seq.toString() in self.keymap.values():
+				self.seq=[]
+				self.releaseKeyboard()
+				return(False)
+			self.keybind_signal.emit(seq.toString().replace(", ","+"))
 			self.releaseKeyboard()
+			self.seq=[]
 			if self.processed==False:
 				action=self.getSettingForHotkey()
 				retVal={"hotkey":self.text(),"action":action}
