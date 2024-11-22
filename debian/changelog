@@ -1,6 +1,7 @@
-python3-qtextrawidgets (0.4.2-0lliurex25) noble; urgency=medium
+python3-qtextrawidgets (0.5.0-0lliurex25) noble; urgency=medium
 
   * Noble release
+  * Switch PySide6
   * QInfoLabel
   *   hide timeout
   *   MSG summary
