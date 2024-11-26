@@ -151,8 +151,8 @@ class QStackedWindow(QWidget):
 
 	def setIcon(self,ficon):
 		#Wayland only:
-		# setwindowIcon doesn't works under W
-		# so the standar sais that icon must be getted from .desktop
+		# setwindowIcon doesn't works under Wayland
+		# so the standar expects icon from .desktop
 		# as a dirty hack the assumption is that a desktop file with the ficon name must exists
 		# ex: "repoman" icon -> net.lliurex.repoman.desktop
 		# so desktop file search could be avoided
