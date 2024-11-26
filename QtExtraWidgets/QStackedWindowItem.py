@@ -170,34 +170,34 @@ class QStackedWindowItem(QWidget):
 	def _getSignalForConnection(self,widget):
 		if isinstance(widget,QCheckBox):
 			#widget.stateChanged.connect(self.setChanged,Qt.UniqueConnection)
-			widget.stateChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)
+			widget.stateChanged.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)
 			self.connectWdgs.append(widget)
 		if isinstance(widget,QRadioButton):
-			widget.toggled.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#self.setChanged,Qt.UniqueConnection)
+			widget.toggled.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QComboBox):
-			widget.currentTextChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.currentTextChanged.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QLineEdit):
-			widget.textChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.textChanged.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QSlider):
-			widget.valueChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.valueChanged.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QCalendarWidget):
-			widget.selectionChanged.connect(lambda: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.selectionChanged.connect(lambda: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QPushButton):
 			if widget.menu():
-				widget.menu().triggered.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+				widget.menu().triggered.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			else:
-				widget.clicked.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+				widget.clicked.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif 'dropButton' in str(widget):
-			widget.drop.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.drop.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QTableWidget):
-			widget.cellChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.cellChanged.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 		widget.blockSignals(False)
 	#def _getSignalForConnection
 
