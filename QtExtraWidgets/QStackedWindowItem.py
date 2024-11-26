@@ -306,9 +306,9 @@ class QStackedWindowItem(QWidget):
 		timeout=0
 		if len(args)>0:
 			for arg in args:
-				if isinstance(a,str) and text=="":
+				if isinstance(arg,str) and text=="":
 					text=arg
-				if isinstance(a,int) and timeout==0:
+				if isinstance(arg,int) and timeout==0:
 					timeout=arg
 		if kwargs.get("text","")!="":
 			text=kwargs["text"]
