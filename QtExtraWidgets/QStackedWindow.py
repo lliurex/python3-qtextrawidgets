@@ -6,9 +6,9 @@ import inspect
 import time
 from queue import Queue
 import traceback
-from PySide2.QtWidgets import QApplication,QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
-from PySide2 import QtGui
-from PySide2.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
+from PySide6.QtWidgets import QApplication,QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
+from PySide6 import QtGui
+from PySide6.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
 from QtExtraWidgets import QPushInfoButton as qinfo,QTableTouchWidget as qtouch
 import notify2
 QString=type("")
@@ -151,8 +151,8 @@ class QStackedWindow(QWidget):
 
 	def setIcon(self,ficon):
 		#Wayland only:
-		# setwindowIcon doesn't works under W
-		# so the standar sais that icon must be getted from .desktop
+		# setwindowIcon doesn't works under Wayland
+		# so the standar expects icon from .desktop
 		# as a dirty hack the assumption is that a desktop file with the ficon name must exists
 		# ex: "repoman" icon -> net.lliurex.repoman.desktop
 		# so desktop file search could be avoided
@@ -179,13 +179,18 @@ class QStackedWindow(QWidget):
 	#def setIcon
 
 	def setBanner(self,banner):
+		pxm=banner
 		if not os.path.isfile(banner):
 			if os.path.isfile(os.path.join(self.rsrc,banner)):
 				banner=os.path.join(self.rsrc,banner)
 			else:
 				banner=""
 				self._debug("Banner not found at {}".format(self.rsrc))
-		self.lblBanner.setPixmap(banner)
+		if os.path.isfile(banner):
+			pxm=QtGui.QPixmap(QtGui.QImage(banner))
+			
+		if isinstance(pxm,QtGui.QPixmap) or isinstance(pxm,QtGui.QImage):
+			self.lblBanner.setPixmap(pxm)
 	#def setBanner
 
 	def disableNavBar(self,state):
