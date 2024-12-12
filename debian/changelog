@@ -1,7 +1,6 @@
-python3-qtextrawidgets (0.4.2-0llx23) jammy; urgency=medium
+python3-qtextrawidgets (0.5.0.1-0lliurex23) jammy; urgency=medium
 
-  * QStackedWindowItem:
-  *   Fix rowconunt for VBoxLayout
+  * Sync with noble
 
  -- Juanma1980 <juanma1980@gmail.com>  Thu, 12 Dec 2024 11:10:58 +0100
 
