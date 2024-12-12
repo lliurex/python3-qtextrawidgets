@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import os
 import traceback
-from PySide2.QtWidgets import QDialog,QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QLabel,QPushButton,QLineEdit,\
+from PySide6.QtWidgets import QDialog,QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QLabel,QPushButton,QLineEdit,\
 	QRadioButton,QCheckBox,QComboBox,QTableWidget,QSlider,QScrollArea,QMessageBox,QCalendarWidget
-from PySide2 import QtGui
-#from PySide2.QtWidgets import QApplication
-from PySide2.QtCore import Qt,QUrl,QObject, Slot, Signal, Property,QThread,QSize,QTimer
+from PySide6 import QtGui
+#from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import Qt,QUrl,QObject, Slot, Signal, Property,QThread,QSize,QTimer
 from QtExtraWidgets.QInfoLabel import QInfoLabel
 import logging
 import gettext
@@ -99,7 +99,13 @@ class QStackedWindowItem(QWidget):
 				box_btns.addWidget(self.btnAccept)
 				box_btns.addWidget(self.btnCancel)
 				if isinstance(layout,QGridLayout):
-					layout.addLayout(box_btns,layout.rowCount(),0,1,layout.columnCount(),Qt.AlignBottom|Qt.AlignRight)
+					idx=layout.rowCount()
+				align=Qt.AlignBottom|Qt.AlignRight
+				if self.btnAccept.isEnabled()==False:
+					idx=0
+				print(self.btnAccept.isEnabled())
+				if isinstance(layout,QGridLayout):
+					layout.addLayout(box_btns,idx,0,1,layout.columnCount(),Qt.AlignTop|Qt.AlignRight)
 				elif isinstance(layout,QVBoxLayout) or isinstance(layout,QHBoxLayout):
 					layout.addLayout(box_btns,Qt.AlignBottom|Qt.AlignRight)
 		return (states)
@@ -164,34 +170,34 @@ class QStackedWindowItem(QWidget):
 	def _getSignalForConnection(self,widget):
 		if isinstance(widget,QCheckBox):
 			#widget.stateChanged.connect(self.setChanged,Qt.UniqueConnection)
-			widget.stateChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)
+			widget.stateChanged.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)
 			self.connectWdgs.append(widget)
 		if isinstance(widget,QRadioButton):
-			widget.toggled.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#self.setChanged,Qt.UniqueConnection)
+			widget.toggled.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QComboBox):
-			widget.currentTextChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.currentTextChanged.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QLineEdit):
-			widget.textChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.textChanged.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QSlider):
-			widget.valueChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.valueChanged.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QCalendarWidget):
-			widget.selectionChanged.connect(lambda: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.selectionChanged.connect(lambda: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QPushButton):
 			if widget.menu():
-				widget.menu().triggered.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+				widget.menu().triggered.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			else:
-				widget.clicked.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+				widget.clicked.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif 'dropButton' in str(widget):
-			widget.drop.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.drop.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 			self.connectWdgs.append(widget)
 		elif isinstance(widget,QTableWidget):
-			widget.cellChanged.connect(lambda x: self.setChanged(True,widget),Qt.UniqueConnection)#(self.setChanged,Qt.UniqueConnection)
+			widget.cellChanged.connect(lambda x: self.setChanged(True,widget),Qt.AutoConnection)#(self.setChanged,Qt.UniqueConnection)
 		widget.blockSignals(False)
 	#def _getSignalForConnection
 
@@ -256,6 +262,7 @@ class QStackedWindowItem(QWidget):
 
 	def hideControlButtons(self):
 		self.btnAccept.hide()
+		self.btnAccept.setEnabled(False)
 		self.btnCancel.hide()
 	#def hideControlButtons(self):
 
@@ -299,9 +306,9 @@ class QStackedWindowItem(QWidget):
 		timeout=0
 		if len(args)>0:
 			for arg in args:
-				if isinstance(a,str) and text=="":
+				if isinstance(arg,str) and text=="":
 					text=arg
-				if isinstance(a,int) and timeout==0:
+				if isinstance(arg,int) and timeout==0:
 					timeout=arg
 		if kwargs.get("text","")!="":
 			text=kwargs["text"]
@@ -313,6 +320,10 @@ class QStackedWindowItem(QWidget):
 		self.statusMsg.setTimeout(timeout)
 		self.statusMsg.setVisible(True)
 	#def showMsg
+
+	def hideMsg(self):
+		self.statusMsg.setVisible(False)
+	#def hideMsg
 
 	def sendNotify(self,**kwargs):
 		if self.parent!=None:
