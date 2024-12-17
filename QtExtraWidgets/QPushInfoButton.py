@@ -5,6 +5,7 @@ from PySide2.QtWidgets import QLabel, QPushButton,QGridLayout,QHBoxLayout,QSizeP
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal
 from QtExtraWidgets import QTableTouchWidget,QStackedWindowItem,QInfoLabel
+import requests
 
 class QPushInfoButton(QPushButton):
 	clicked=Signal("PyObject")
@@ -34,8 +35,13 @@ class QPushInfoButton(QPushButton):
 		if os.path.isfile(img):
 			icn=QtGui.QPixmap.fromImage(img)
 		elif img!='':
-			icn2=QtGui.QIcon.fromTheme(img)
-			icn=icn2.pixmap(128,128)
+			if img.startswith("http"):
+				raw=requests.get(img)
+				icn=QtGui.QPixmap()
+				icn.loadFromData(raw.content)
+			else:
+				icn2=QtGui.QIcon.fromTheme(img)
+				icn=icn2.pixmap(128,128)
 		else:
 			icn2=QtGui.QIcon.fromTheme("preferences-system")
 			icn=icn2.pixmap(128,128)
