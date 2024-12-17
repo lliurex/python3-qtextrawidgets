@@ -5,6 +5,7 @@ from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication,QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QTableWidget,QScrollArea,QLabel,QGroupBox,QRadioButton
 from PySide2.QtCore import QFile, QIODevice
 from PySide2.QtGui import QColor
+
 #Widget that loads the configuration from config.ui of a kwin script.
 #Work with main configuration from script
 
