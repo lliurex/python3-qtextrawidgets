@@ -4,6 +4,9 @@ python3-qtextrawidgets (0.5.1.0-0llx23) jammy; urgency=medium
   *  QKdeConfigScreen loads a configuration screen from a kwin script
   *  To instantiate this the path to the config.ui of the script
   *   must be provided 
+  * QPushButtonInfo:
+  *  Load images from url
+  * Minor fixes
 
  -- Juanma1980 <juanma1980@gmail.com>  Tue, 17 Dec 2024 11:35:28 +0100
 
