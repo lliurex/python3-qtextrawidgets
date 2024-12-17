@@ -9,7 +9,7 @@ from PySide2.QtGui import QColor
 #Work with main configuration from script
 
 plugtype="Effect"
-class QKdeConfigScreen(QWidget):
+class QKdeConfigWidget(QWidget):
 	def __init__(self,uiFile,parent=None):
 		super().__init__()
 		QuiFile = QFile(uiFile)
@@ -186,3 +186,6 @@ class QKdeConfigScreen(QWidget):
 		return(uiId)
 	#def getId
 #class configLoader
+
+if __name__=="__main__":
+	obj=QKdeConfigWidget()
