@@ -2,36 +2,41 @@
 import os,subprocess
 import sys
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QApplication,QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QTableWidget,QScrollArea,QLabel,QGroupBox,QRadioButton
+from PySide2.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QTableWidget,QScrollArea,QLabel,QGroupBox,QRadioButton
 from PySide2.QtCore import QFile, QIODevice
 from PySide2.QtGui import QColor
 
 #Widget that loads the configuration from config.ui of a kwin script.
 #Work with main configuration from script
 
-plugtype="Effect"
 class QKdeConfigWidget(QWidget):
-	def __init__(self,uiFile,parent=None):
-		super().__init__()
+	def __init__(self,uiFile,*args,**kwargs):
+		parent = kwargs.get('parent')
+		if not parent:
+			for i in args:
+				if isinstance(i,QWidget):
+					parent = i
+		super().__init__(*args,**kwargs)
+		self.plugType="Effect"
+		self.wlayout=QGridLayout()
 		QuiFile = QFile(uiFile)
 		if not QuiFile.open(QIODevice.ReadOnly):
-			print(f"Cannot open {UiFile}: {QuiFile.errorString()}")
-			sys.exit(-1)
-		loader = QUiLoader()
-		window = loader.load(QuiFile)
-		QuiFile.close()
-		if not window:
-			print(loader.errorString())
-			sys.exit(-1)
-		self.uiId=self.getId(uiFile)
-		layout=window.layout()
-		self.configWidgets=self._recursiveSetupEvents(layout)
-		self.readConfig()
-		lay=QGridLayout()
-		lay.addWidget(window)
-		if isinstance(window.children()[-1],QLabel):
-			window.children()[-1].setVisible(False)
-		self.setLayout(lay)
+			print(f"Cannot open {uiFile}: {QuiFile.errorString()}")
+		else:
+			loader = QUiLoader()
+			window = loader.load(QuiFile)
+			QuiFile.close()
+			if not window:
+				print(loader.errorString())
+				sys.exit(-1)
+			self.uiId=self.getId(uiFile)
+			layout=window.layout()
+			self.configWidgets=self._recursiveSetupEvents(layout)
+			self.readConfig()
+			self.wlayout.addWidget(window)
+			if isinstance(window.children()[-1],QLabel):
+				window.children()[-1].setVisible(False)
+		self.setLayout(self.wlayout)
 	#def __init__
 
 	def _getSignalForConnection(self,widget):
@@ -93,16 +98,16 @@ class QKdeConfigWidget(QWidget):
 
 	def readConfig(self):
 		if "effect" in self.uiId:
-			plugType="Effect"
+			self.plugType="Effect"
 		else:
-			plugType="Script"
+			self.plugType="Script"
 		if len(self.configWidgets)>0:
 			for name,wdg in self.configWidgets:
 				if len(name)==0:
 					continue
 				#if hasattr(wdg,"text"):
 				key=name.replace("kcfg_","")
-				cmd=["kreadconfig5","--file","kwinrc","--group","{0}-{1}".format(plugType,self.uiId),"--key",key]
+				cmd=["kreadconfig5","--file","kwinrc","--group","{0}-{1}".format(self.plugType,self.uiId),"--key",key]
 				out=subprocess.check_output(cmd,universal_newlines=True,encoding="utf8")
 				value=out.strip()
 				if len(value)>0:
@@ -140,9 +145,9 @@ class QKdeConfigWidget(QWidget):
 	def saveChanges(self):
 		cmd=""
 		if "effect" in self.uiId:
-			plugType="Effect"
+			self.plugType="Effect"
 		else:
-			plugType="Script"
+			self.plugType="Script"
 		for name,wdg in self.configWidgets:
 			if isinstance(wdg,QLabel):
 				continue
@@ -152,14 +157,14 @@ class QKdeConfigWidget(QWidget):
 			hasKcolor=wdg.property("color")
 			if hasKcolor!=None:
 				color="{0},{1},{2}".format(hasKcolor.red(),hasKcolor.green(),hasKcolor.blue())
-				cmd=self._generateCommand(plugType,self.uiId,key,color)
+				cmd=self._generateCommand(self.plugType,self.uiId,key,color)
 			elif hasattr(wdg,"checkState") or hasattr(wdg,"group"):
 				state=wdg.isChecked()
-				cmd=self._generateCommand(plugType,self.uiId,key,str(state).lower())
+				cmd=self._generateCommand(self.plugType,self.uiId,key,str(state).lower())
 			elif hasattr(wdg,"value"):
-				cmd=self._generateCommand(plugType,self.uiId,key,str(wdg.value()))
+				cmd=self._generateCommand(self.plugType,self.uiId,key,str(wdg.value()))
 			elif hasattr(wdg,"text"):
-				cmd=self._generateCommand(plugType,self.uiId,key,str(wdg.text()))
+				cmd=self._generateCommand(self.plugType,self.uiId,key,str(wdg.text()))
 			if len(cmd)>0:
 				subprocess.run(cmd)
 	#def saveChanges
@@ -186,7 +191,7 @@ class QKdeConfigWidget(QWidget):
 					uiId=uiId.replace(" ","").replace("\"","").replace(",","").strip()
 		return(uiId)
 	#def getId
-#class configLoader
+#class QKdeConfigWidget
 
 if __name__=="__main__":
 	obj=QKdeConfigWidget()
