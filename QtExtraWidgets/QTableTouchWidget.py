@@ -9,7 +9,7 @@ class QTableTouchWidget(QTableWidget):
 				if isinstance(i,QWidget):
 					parent = i
 		super().__init__(*args,**kwargs)
-		self.scroller=QScroller()
+		self.wscroller=QScroller()
 		self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
 		self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
 #		sp=self.scroller.scrollerProperties()
@@ -22,7 +22,8 @@ class QTableTouchWidget(QTableWidget):
 #		sp.setScrollMetric(QScrollerProperties.MaximumClickThroughVelocity,0)
 #		sp.setScrollMetric(QScrollerProperties.DragStartDistance,0.001)
 #		sp.setScrollMetric(QScrollerProperties.MousePressEventDelay,0.5)
-		self.scroller.grabGesture(self.viewport(),QScroller.LeftMouseButtonGesture)
+		self.wscroller.grabGesture(self.viewport(),QScroller.LeftMouseButtonGesture)
+		self.setScroller(self.wscroller)
 	#def __init__
 #class QTableTouchWidget
 
