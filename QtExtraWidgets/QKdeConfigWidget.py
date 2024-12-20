@@ -2,7 +2,7 @@
 import os,subprocess
 import sys
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QTableWidget,QScrollArea,QLabel,QGroupBox,QRadioButton
+from PySide2.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QTableWidget,QScrollArea,QLabel,QGroupBox
 from PySide2.QtCore import QFile, QIODevice
 from PySide2.QtGui import QColor
 import gettext
@@ -48,8 +48,11 @@ class QKdeConfigWidget(QWidget):
 			if hasattr(wdg,"text"):
 				i18nText=_(wdg.text())
 				if i18nText!=wdg.text():
-					print(i18nText)
 					wdg.setText(i18nText)
+			elif hasattr(wdg,"count"):
+				for row in range(0,wdg.count()):
+					if hasattr(wdg,"setItemText"):
+						wdg.setItemText(row,_(wdg.itemText(row)))
 	#def _retranslate
 
 	def _getSignalForConnection(self,widget):
