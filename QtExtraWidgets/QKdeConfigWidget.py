@@ -36,10 +36,10 @@ class QKdeConfigWidget(QWidget):
 			layout=window.layout()
 			self.configWidgets=self._recursiveSetupEvents(layout)
 			self.readConfig()
+			self._retranslate()
 			self.wlayout.addWidget(window)
 			if isinstance(window.children()[-1],QLabel):
 				window.children()[-1].setVisible(False)
-			self._retranslate()
 		self.setLayout(self.wlayout)
 	#def __init__
 
@@ -53,6 +53,10 @@ class QKdeConfigWidget(QWidget):
 				for row in range(0,wdg.count()):
 					if hasattr(wdg,"setItemText"):
 						wdg.setItemText(row,_(wdg.itemText(row)))
+			elif hasattr(wdg,"title"):
+				if len(wdg.title())>0:
+					title=_(wdg.title())
+					wdg.setTitle(title)
 	#def _retranslate
 
 	def _getSignalForConnection(self,widget):
@@ -99,6 +103,8 @@ class QKdeConfigWidget(QWidget):
 			widget=layout.itemAt(idx).widget()
 			if isinstance(widget,QWidget):
 				if isinstance(widget,QGroupBox):
+					if widget not in configWidgets:
+						configWidgets.append(("",widget))
 					for rad in widget.children():
 						wdg=self._recursiveExploreWidgets(rad)
 						if wdg not in configWidgets:
