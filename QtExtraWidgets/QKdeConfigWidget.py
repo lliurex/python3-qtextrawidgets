@@ -5,8 +5,10 @@ from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QTableWidget,QScrollArea,QLabel,QGroupBox,QRadioButton
 from PySide2.QtCore import QFile, QIODevice
 from PySide2.QtGui import QColor
+import gettext
+_=gettext.gettext
 
-#Widget that loads the configuration from config.ui of a kwin script.
+#Widget that loads the configuration file config.ui from a kwin script.
 #Work with main configuration from script
 
 class QKdeConfigWidget(QWidget):
@@ -23,21 +25,32 @@ class QKdeConfigWidget(QWidget):
 		if not QuiFile.open(QIODevice.ReadOnly):
 			print(f"Cannot open {uiFile}: {QuiFile.errorString()}")
 		else:
+			self._setTranslationDomain(uiFile)
+			self.uiId=self.getId(uiFile)
 			loader = QUiLoader()
 			window = loader.load(QuiFile)
 			QuiFile.close()
 			if not window:
 				print(loader.errorString())
 				sys.exit(-1)
-			self.uiId=self.getId(uiFile)
 			layout=window.layout()
 			self.configWidgets=self._recursiveSetupEvents(layout)
 			self.readConfig()
 			self.wlayout.addWidget(window)
 			if isinstance(window.children()[-1],QLabel):
 				window.children()[-1].setVisible(False)
+			self._retranslate()
 		self.setLayout(self.wlayout)
 	#def __init__
+
+	def _retranslate(self):
+		for name,wdg in self.configWidgets:
+			if hasattr(wdg,"text"):
+				i18nText=_(wdg.text())
+				if i18nText!=wdg.text():
+					print(i18nText)
+					wdg.setText(i18nText)
+	#def _retranslate
 
 	def _getSignalForConnection(self,widget):
 		name=widget.objectName()
@@ -191,6 +204,31 @@ class QKdeConfigWidget(QWidget):
 					uiId=uiId.replace(" ","").replace("\"","").replace(",","").strip()
 		return(uiId)
 	#def getId
+
+	def _setTranslationDomain(self,UiFile):
+		path=UiFile
+		end=False
+		domain=""
+		while end==False:
+			path=os.path.dirname(path)
+			for f in os.scandir(path):
+				if f.name.startswith("metadata")==True:
+					end=True
+					path=f.path
+			if path.count("/")<=2:
+				end=True
+		if path.endswith("json") or path.endswith("desktop"):
+			with open(path,"r") as f:
+				fcontent=f.readlines()
+			for l in fcontent:
+				if l.lstrip().startswith("\"X-KWin-Config-TranslationDomain\""):
+					domain=l.split(":")[-1]
+					domain=domain.replace(" ","").replace("\"","").replace(",","").strip()
+		if len(domain)>0:
+			domainPath=os.path.join(os.path.dirname(path),"contents","locale")
+			gettext.bindtextdomain(domain,domainPath)
+			gettext.textdomain(domain)
+		return(domain)
 #class QKdeConfigWidget
 
 if __name__=="__main__":
