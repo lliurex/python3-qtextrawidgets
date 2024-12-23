@@ -21,6 +21,7 @@ class QKdeConfigWidget(QWidget):
 		super().__init__(*args,**kwargs)
 		self.plugType="Effect"
 		self.wlayout=QGridLayout()
+		self.confFile=os.path.join(os.path.dirname(os.path.dirname(uiFile)),"config","main.xml")
 		QuiFile = QFile(uiFile)
 		if not QuiFile.open(QIODevice.ReadOnly):
 			print(f"Cannot open {uiFile}: {QuiFile.errorString()}")
@@ -132,31 +133,48 @@ class QKdeConfigWidget(QWidget):
 				cmd=["kreadconfig5","--file","kwinrc","--group","{0}-{1}".format(self.plugType,self.uiId),"--key",key]
 				out=subprocess.check_output(cmd,universal_newlines=True,encoding="utf8")
 				value=out.strip()
-				if len(value)>0:
-					if isinstance(wdg,QPushButton):
-						hasKcolor=wdg.property("color")
-						if hasKcolor!=None:
-							kcolor=value.split(",")
-							newcolor=QColor.fromRgb(int(kcolor[0]),int(kcolor[1]),int(kcolor[2]))
-							wdg.setProperty("color",newcolor)
-						wdg.setText(value)
-					elif hasattr(wdg,"checkState"):
-						state=True
-						if value!="true":
-							state=False
-						wdg.setChecked(state)
-					elif hasattr(wdg,"isChecked"):
-						state=True
-						if value!="true":
-							state=False
-						wdg.setChecked(state)
-					elif hasattr(wdg,"setCurrentIndex"):
-						wdg.setCurrentIndex(int(value))
-					elif hasattr(wdg,"setValue"):
-						wdg.setValue(int(value))
-					elif hasattr(wdg,"setText"):
-						wdg.setText(value)
+				if len(value)<=0:
+					value=self._getDefaultValue(key)
+				if isinstance(wdg,QPushButton):
+					hasKcolor=wdg.property("color")
+					if hasKcolor!=None:
+						kcolor=value.split(",")
+						newcolor=QColor.fromRgb(int(kcolor[0]),int(kcolor[1]),int(kcolor[2]))
+						wdg.setProperty("color",newcolor)
+					wdg.setText(value)
+				elif hasattr(wdg,"checkState"):
+					state=True
+					if value!="true":
+						state=False
+					wdg.setChecked(state)
+				elif hasattr(wdg,"isChecked"):
+					state=True
+					if value!="true":
+						state=False
+					wdg.setChecked(state)
+				elif hasattr(wdg,"setCurrentIndex"):
+					wdg.setCurrentIndex(int(value))
+				elif hasattr(wdg,"setValue"):
+					wdg.setValue(int(value))
+				elif hasattr(wdg,"setText"):
+					wdg.setText(value)
 	#def readConfig
+
+	def _getDefaultValue(self,key):
+		value=""
+		if os.path.exists(self.confFile):
+			with open(self.confFile,"r") as f:
+				fcontent=f.readlines()
+			sw=False
+			for fline in fcontent:
+				if "entry name=\"{}\"".format(key) in fline:
+					sw=True
+					continue
+				if sw==True:
+					value=fline.strip().removeprefix("<default>").removesuffix("</default>")
+					break
+		return(value)
+	#def _getDefaultValue
 
 	def _generateCommand(self,plugType,uiId,key,text):
 		cmd=[]
