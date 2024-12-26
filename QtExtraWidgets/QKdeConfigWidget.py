@@ -9,7 +9,7 @@ import gettext
 _=gettext.gettext
 
 #Widget that loads the configuration file config.ui from a kwin script.
-#Work with main configuration from script
+#Uses main configuration from script
 
 class QKdeConfigWidget(QWidget):
 	def __init__(self,uiFile,*args,**kwargs):
@@ -242,6 +242,7 @@ class QKdeConfigWidget(QWidget):
 				if f.name.startswith("metadata")==True:
 					end=True
 					path=f.path
+					break
 			if path.count("/")<=2:
 				end=True
 		if path.endswith("json") or path.endswith("desktop"):
