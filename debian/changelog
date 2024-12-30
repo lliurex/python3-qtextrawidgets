@@ -2,6 +2,7 @@ python3-qtextrawidgets (0.5.1.1-0llx23) jammy; urgency=medium
 
   * QKdeConfigScreen:
   *  Set domain for translations from metadata
+  *  Add support for QComboBox
 
  -- Juanma1980 <juanma1980@gmail.com>  Fri, 20 Dec 2024 08:25:33 +0100
 
