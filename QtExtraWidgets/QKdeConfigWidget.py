@@ -201,6 +201,8 @@ class QKdeConfigWidget(QWidget):
 			elif hasattr(wdg,"checkState") or hasattr(wdg,"group"):
 				state=wdg.isChecked()
 				cmd=self._generateCommand(self.plugType,self.uiId,key,str(state).lower())
+			elif hasattr(wdg,"currentIndex"):
+				cmd=self._generateCommand(self.plugType,self.uiId,key,str(wdg.currentIndex()))
 			elif hasattr(wdg,"value"):
 				cmd=self._generateCommand(self.plugType,self.uiId,key,str(wdg.value()))
 			elif hasattr(wdg,"text"):
