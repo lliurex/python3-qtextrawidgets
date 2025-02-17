@@ -22,15 +22,15 @@ class QKdeConfigWidget(QWidget):
 		self.plugType="Effect"
 		self.wlayout=QGridLayout()
 		self.confFile=os.path.join(os.path.dirname(os.path.dirname(uiFile)),"config","main.xml")
-		QuiFile = QFile(uiFile)
-		if not QuiFile.open(QIODevice.ReadOnly):
-			print(f"Cannot open {uiFile}: {QuiFile.errorString()}")
+		QUiFile = QFile(uiFile)
+		if not QUiFile.open(QIODevice.ReadOnly):
+			print(f"Cannot open {uiFile}: {QUiFile.errorString()}")
 		else:
 			self._setTranslationDomain(uiFile)
 			self.uiId=self.getId(uiFile)
 			loader = QUiLoader()
-			window = loader.load(QuiFile)
-			QuiFile.close()
+			window = loader.load(QUiFile)
+			QUiFile.close()
 			if not window:
 				print(loader.errorString())
 				sys.exit(-1)
