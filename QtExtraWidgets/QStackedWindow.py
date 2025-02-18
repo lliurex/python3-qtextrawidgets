@@ -6,9 +6,9 @@ import inspect
 import time
 from queue import Queue
 import traceback
-from PySide6.QtWidgets import QApplication,QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
-from PySide6 import QtGui
-from PySide6.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
+from PySide2.QtWidgets import QApplication,QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
+from PySide2 import QtGui
+from PySide2.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
 from QtExtraWidgets import QPushInfoButton as qinfo,QTableTouchWidget as qtouch
 import notify2
 QString=type("")
@@ -158,25 +158,81 @@ class QStackedWindow(QWidget):
 		# so desktop file search could be avoided
 		#IMPORTANT: desktop file must match convention of reverse domain standard (xx.xx.xxxxx.desktop)
 		if isinstance(ficon,str):
-			self._setIconFromPath(ficon)
-			QtGui.QGuiApplication.setDesktopFileName(os.path.basename(ficon))
+			icon=self._getIconFromPath(ficon)
+			if icon.isNull()==True:
+				icon=QtGui.QIcon.fromTheme(ficon)
 		elif isinstance(ficon,QtGui.QIcon):
-			self.setWindowIcon(ficon)
-			QtGui.QGuiApplication.setDesktopFileName(os.path.basename(ficon.name()))
-			super(QStackedWindow,self).setWindowIcon(ficon)
+			icon=ficon
 		elif isinstance(ficon,QtGui.QPixmap):
-			print("Not implemented")
+			icon=QtGui.QIcon.addPixmap(ficon,QtGui.QIcon.Mode.Normal)
+		desktopFile=self._getDesktopFromIcon(icon,ficon)
+		#QtGui.QGuiApplication.setDesktopFileName(os.path.basename(desktopFile))
+		QtGui.QGuiApplication.setDesktopFileName(desktopFile)
+		self.setWindowIcon(icon)
+		super(QStackedWindow,self).setWindowIcon(icon)
 	#def setIcon(self,ficon):
 
-	def _setIconFromPath(self,ficon):
+	def _getIconFromPath(self,ficon):
 		self._debug("Icon from: {}".format(ficon))
+		icon=QtGui.QIcon()
 		if os.path.isfile(ficon):
-			icon=QtGui.QIcon(ficon)
-		else:
-			icon=QtGui.QIcon.fromTheme(ficon)
-		self._debug("Icon: {}".format(icon))
-		self.setWindowIcon(icon)
-	#def setIcon
+			icon.addFile(ficon)
+		return(icon)
+	#def _getIconFromPath
+
+	def _getDesktopFromIcon(self,icon,ficon):
+		self._debug("Search desktop for icon: {} (name: {})".format(icon,icon.name()))
+		iconName=icon.name()
+		if icon.isNull():
+			iconName=os.path.basename(ficon)
+		desktopPaths=["/usr/share/applications",os.path.join(os.environ["HOME"],".local","share","applications")]
+		dFile=""
+		for dpath in desktopPaths:
+			tfile=os.path.join(dpath,"{}.desktop".format(iconName))
+			cfile=os.path.join(dpath,"net.lliurex.{}.desktop".format(iconName))
+			if os.path.isfile(tfile):
+				dFile=tfile
+				break
+			elif os.path.isfile(cfile):
+				dFile=cfile
+				break
+		if os.path.exists(dFile)==False:
+			dFile=self._deepSearchDesktopFromIcon(iconName)
+		dFile=os.path.basename(dFile).replace(".desktop","")
+		self._debug("Desktop: {}".format(dFile))
+		return(dFile)
+	#def _getDesktopFromIcon
+
+	def _deepSearchDesktopFromIcon(self,iconName):
+		self._debug("DeepSearch desktop for icon: {}".format(iconName))
+		desktopPaths=["/usr/share/applications",os.path.join(os.environ["HOME"],".local","share","applications")]
+		dFile=""
+		for dpath in desktopPaths:
+			for fpath in os.scandir(dpath):
+				if fpath.path.endswith("{}.desktop".format(iconName)):
+					dFile=fpath.path
+					break
+			if dFile!="":
+				break
+		if dFile=="":
+			for dpath in desktopPaths:
+				for fpath in os.scandir(dpath):
+					if fpath.is_file()==False:
+						continue
+					try:
+						with open(fpath.path,"r") as f:
+							for fline in f.read().split("\n"):
+								if iconName in fline and fline.lower().startswith("icon"):
+									dFile=fpath.path
+									break
+					except:
+						continue
+					if dFile!="":
+						break
+				if dFile!="":
+					break
+		return(dFile)
+	#def _deepSearchDesktopFromIcon
 
 	def setBanner(self,banner):
 		pxm=banner
