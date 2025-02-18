@@ -1,6 +1,6 @@
-from PySide2.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QHBoxLayout,QDialog,QAbstractItemView,QGridLayout,QTableWidgetItem
-from PySide2 import QtGui
-from PySide2.QtCore import Qt,Signal,QEvent,QThread,QSize
+from PySide6.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QHBoxLayout,QDialog,QAbstractItemView,QGridLayout,QTableWidgetItem
+from PySide6 import QtGui
+from PySide6.QtCore import Qt,Signal,QEvent,QThread,QSize
 from QtExtraWidgets import QTableTouchWidget
 import os,requests
 

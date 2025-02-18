@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import os
 import traceback
-from PySide2.QtWidgets import QDialog,QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QLabel,QPushButton,QLineEdit,\
+from PySide6.QtWidgets import QDialog,QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QLabel,QPushButton,QLineEdit,\
 	QRadioButton,QCheckBox,QComboBox,QTableWidget,QSlider,QScrollArea,QMessageBox,QCalendarWidget
-from PySide2 import QtGui
-#from PySide2.QtWidgets import QApplication
-from PySide2.QtCore import Qt,QUrl,QObject, Slot, Signal, Property,QThread,QSize,QTimer
+from PySide6 import QtGui
+#from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import Qt,QUrl,QObject, Slot, Signal, Property,QThread,QSize,QTimer
 from QtExtraWidgets.QInfoLabel import QInfoLabel
 import logging
 import gettext
