@@ -9,6 +9,8 @@ from . import QSearchBox as _QSearchBox
 from . import QStackedWindow as _QStackedWindow
 from . import QStackedWindowItem as _QStackedWindowItem
 from . import QTableTouchWidget as _QTableTouchWidget
+from . import QFlowTouchWidget as _QFlowTouchWidget
+from . import QKdeConfigWidget as _QKdeConfigWidget
 
 class QCheckableComboBox(_QCheckableComboBox.QCheckableComboBox):
 	def __init__(self,*args,**kwargs):
@@ -47,6 +49,14 @@ class QStackedWindowItem(_QStackedWindowItem.QStackedWindowItem):
 		super().__init__(*args,**kwargs)
 
 class QTableTouchWidget(_QTableTouchWidget.QTableTouchWidget):
+	def __init__(self,*args,**kwargs):
+		super().__init__(*args,**kwargs)
+
+class QFlowTouchWidget(_QFlowTouchWidget.QFlowTouchWidget):
+	def __init__(self,*args,**kwargs):
+		super().__init__(*args,**kwargs)
+
+class QKdeconfigWidget(_QKdeConfigWidget.QKdeConfigWidget):
 	def __init__(self,*args,**kwargs):
 		super().__init__(*args,**kwargs)
 
