@@ -1,3 +1,7 @@
+python3-qtextrawidgets (0.5.2.0-0lliurex25) noble; urgency=medium
+
+  * Sync with jammy
+
 python3-qtextrawidgets (0.5.0.1-0lliurex25) noble; urgency=medium
 
   * QSearchBox 
