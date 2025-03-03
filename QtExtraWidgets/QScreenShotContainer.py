@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QHBoxLayout,QDialog,QAbstractItemView,QGridLayout,QTableWidgetItem
+from PySide2.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QHBoxLayout,QDialog,QAbstractItemView,QGridLayout,QTableWidgetItem,QDesktopWidget
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal,QEvent,QThread,QSize
 from QtExtraWidgets import QTableTouchWidget
@@ -149,8 +149,8 @@ class QScreenShotContainer(QWidget):
 		dlg=QDialog()	
 		dlg.setModal(True)
 		if (w==0) or (h==0):
-			#sizeObject = QDesktopWidget().screenGeometry(-1)
-			sizeObject = QtGui.QScreen.geometry()
+			sizeObject = QDesktopWidget().screenGeometry(-1)
+			#sizeObject = QtGui.QScreen.geometry()
 			w=int(sizeObject.width()/2)
 			h=int(sizeObject.height()/2)
 		xSize=w
