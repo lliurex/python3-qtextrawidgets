@@ -10,5 +10,5 @@ Homepage: http://lliurex.net
 
 Package: python3-qtextrawidgets
 Architecture: all
-Depends: ${python3:Depends},python3-pyside2.qtgui
+Depends: ${python3:Depends},python3-pyside2.qtgui,python3-pyside2.qtuitools
 Description: Custom widgets for PySide
