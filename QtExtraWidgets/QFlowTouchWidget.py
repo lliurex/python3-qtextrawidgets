@@ -103,7 +103,6 @@ class _layout(QLayout):
 	#def doLayout
 #class _layout
 
-
 class QFlowTouchWidget(QScrollArea):
 	def __init__(self, parent=None):
 		super().__init__(parent)
@@ -113,43 +112,58 @@ class QFlowTouchWidget(QScrollArea):
 		self.content = QWidget(self)
 		self.setWidget(self.content)
 		self.flowLayout=_layout(self.content)
+	#def __init__
 
 	def addWidget(self, item):
 		self.flowLayout.addWidget(item)
-
+	#def addWidget
+	
 	def addItem(self, item):
 		self.flowLayout.addItem(item)
+	#def addItem
 
 	def count(self):
 		return(self.flowLayout.count())
+	#def count
 
 	def itemAt(self, index):
 		return self.flowLayout.itemAt(index)
+	#def itemAt
 
 	def takeAt(self, index):
 		return(self.flowLayout.takeAt(index))
+	#def takeAt
 
 	def expandingDirections(self):
 		return self.flowLayout.expandingDirections
+	#def expandingDirections
 
 	def hasHeightForWidth(self):
 		return True
+	#def hasHeightForWidth
 
 	def heightForWidth(self, width):
 		return(self.flowLayout.heightForWidth(width))
+	#def heightForWidth
 
 	def setGeometry(self, rect):
 		self.setGeometry(rect)
+	#def setGeometry
 
 	def sizeHint(self):
 		return(self.flowLayout.sizeHint())
+	#def sizeHint
 
 	def minimumSize(self):
 		return(self.flowLayout.minimumSize())
+	#def minimumSize
 
 	def clean(self):
 		for idx in reversed(range(0,self.content.layout().count())):
-			self.content.layout().itemAt(idx).widget().setParent(None)
+			wdg=self.content.layout().itemAt(idx).widget()
+			if wdg!=None:
+				wdg.setParent(None)
+	#def clean
 #class QFlowTouchWidget
 
 if __name__=="__main__":
