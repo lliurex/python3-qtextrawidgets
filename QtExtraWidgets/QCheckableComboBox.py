@@ -82,10 +82,15 @@ class QCheckableComboBox(QComboBox):
 
 	def getItems(self,*args):
 		items=[]
-		count=self.count()
-		for i in range(0,count):
-			item=self.model().item(i)
-			items.append(item)
+		i=0
+		mitem=self.model().item(i)
+		while mitem:
+			if mitem in items:
+				break
+			items.append(mitem)
+			i+=1
+			#print("QCheckablecomboBox: {}".format(i))
+			mitem=self.model().item(i)
 		return(items)
 	#def getItems
 
