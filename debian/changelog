@@ -1,7 +1,8 @@
-python3-qtextrawidgets (0.5.2.2-0llx23) jammy; urgency=medium
+python3-qtextrawidgets (0.5.2.3-0llx23) jammy; urgency=medium
 
   * Add QFlowTouchWidget: scroll, touch-compatible and flow layout
   * Add exclusive mode for QCheckableComboBox
+  * Add widget method for qstackedwindow
 
  -- Juanma1980 <juanma1980@gmail.com>  Mon, 17 Feb 2025 11:57:33 +0100
 
