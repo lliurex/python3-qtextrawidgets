@@ -98,6 +98,7 @@ class QStackedWindow(QWidget):
 
 	def widget(self,idx):
 		return(self.stkPan.widget(idx))
+	#def widget
 	
 	def _getRowForIdx(self,idx):
 		row=0
