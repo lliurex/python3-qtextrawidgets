@@ -19,7 +19,8 @@ class _layout(QLayout):
 	#def __del__
 
 	def addItem(self, item):
-		self._itemList.append(item)
+		if item!=None:
+			self._itemList.append(item)
 	#def addItem
 
 	def count(self):
@@ -73,8 +74,12 @@ class _layout(QLayout):
 		y = rect.y()
 		line_height = 0
 		spacing = self.spacing()
+		itemList=self._itemList
 
-		for item in self._itemList:
+		for item in itemList:
+			if item.widget()==None:
+				self._itemList.remove(item)
+				continue
 			style = item.widget().style()
 			layout_spacing_x = style.layoutSpacing(
 				QSizePolicy.ControlType.PushButton, QSizePolicy.ControlType.PushButton,
