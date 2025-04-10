@@ -95,6 +95,10 @@ class QStackedWindow(QWidget):
 	def getCurrentStack(self):
 		return(self.stkPan.currentWidget())
 	#def getCurrentStack
+
+	def widget(self,idx):
+		return(self.stkPan.widget(idx))
+	#def widget
 	
 	def _getRowForIdx(self,idx):
 		row=0
@@ -208,10 +212,11 @@ class QStackedWindow(QWidget):
 		desktopPaths=["/usr/share/applications",os.path.join(os.environ["HOME"],".local","share","applications")]
 		dFile=""
 		for dpath in desktopPaths:
-			for fpath in os.scandir(dpath):
-				if fpath.path.endswith("{}.desktop".format(iconName)):
-					dFile=fpath.path
-					break
+			if os.path.exists(dpath):
+				for fpath in os.scandir(dpath):
+					if fpath.path.endswith("{}.desktop".format(iconName)):
+						dFile=fpath.path
+						break
 			if dFile!="":
 				break
 		if dFile=="":
