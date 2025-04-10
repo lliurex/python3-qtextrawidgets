@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QComboBox,QSizePolicy
+from PySide6.QtWidgets import QComboBox,QSizePolicy,QWidget
 from PySide6.QtGui import QStandardItemModel
 from PySide6.QtCore import Qt,Signal
 
@@ -13,17 +13,30 @@ class QCheckableComboBox(QComboBox):
 					parent = i
 		super().__init__(*args,**kwargs)
 		self.view().pressed.connect(self._checked)
+		self.view().setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Preferred)
 		self.setSizeAdjustPolicy(self.SizeAdjustPolicy.AdjustToContents)
 		self.setModel(QStandardItemModel(self))
 		self.checked=False
+		self.title=True
+		self.exclusive=False
 		self.addItem("")
 	#def __init__
 
+	def enableTitle(self,state):
+		self.title=state
+
 	def _checked(self, index):
 		self.checked=True
-		if index.row()==0:
+		first=-1
+		if self.title==True:
+			first=0
+		if index.row()==first:
 			return
+		if self.exclusive==True:
+			for i in range(0,self.count()):
+				item = self.model().item(i)
+				item.setCheckState(Qt.Unchecked)
 		item = self.model().itemFromIndex(index)
 		if item.checkState() == Qt.Checked:
 			item.setCheckState(Qt.Unchecked)
@@ -52,7 +65,10 @@ class QCheckableComboBox(QComboBox):
 	def addItem(self,*args,state=True):
 		super().addItem(args[0])
 		item=self.model().item(self.count()-1)
-		if self.count()>1:
+		first=0
+		if self.title==True:
+			first=1
+		if self.count()>first:
 			if state==True:
 				item.setCheckState(Qt.Checked)
 			else:
@@ -66,9 +82,15 @@ class QCheckableComboBox(QComboBox):
 
 	def getItems(self,*args):
 		items=[]
-		for i in range(0,self.count()):
-			item=self.model().item(i)
-			items.append(item)
+		i=0
+		mitem=self.model().item(i)
+		while mitem:
+			if mitem in items:
+				break
+			items.append(mitem)
+			i+=1
+			#print("QCheckablecomboBox: {}".format(i))
+			mitem=self.model().item(i)
 		return(items)
 	#def getItems
 
