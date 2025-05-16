@@ -49,14 +49,21 @@ class _loadScreenShot(QThread):
 
 	def run(self,*args):
 		img=None
-		stripName=''.join(ch for ch in self.img if ch.isalnum())
+		stripName=''.join(ch for ch in os.path.basename(self.img) if ch.isalnum())
 		MAX=96
 		if (len(stripName)-96>0):
-			stripName=stripName[len(stripName)-96:]
+			stripName=os.path.basename(stripName[len(stripName)-96:])
 		icn=QtGui.QIcon.fromTheme("image-x-generic")
 		pxm=icn.pixmap(512,512)
 		fPath=""
-		if self.cacheDir:
+		if os.path.exists(self.img):
+			pxm=QtGui.QPixmap()
+			try:
+				pxm.load(self.img)
+				img=True
+			except Exception as e:
+				print("Loading cache pixmap: {}".format(e))
+		elif self.cacheDir:
 			fPath=os.path.join(self.cacheDir,stripName)#self.img.split('/')[-1])
 			if os.path.isfile(fPath)==True:
 				pxm=QtGui.QPixmap()
@@ -65,7 +72,7 @@ class _loadScreenShot(QThread):
 					img=True
 				except Exception as e:
 					print("Loading cache pixmap: {}".format(e))
-		if img==None:
+		if img==None and self.img!="":
 			try:
 				img=requests.get(self.img)
 				pxm.loadFromData(img.content)

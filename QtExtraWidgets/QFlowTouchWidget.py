@@ -165,9 +165,10 @@ class QFlowTouchWidget(QScrollArea):
 
 	def clean(self):
 		for idx in reversed(range(0,self.content.layout().count())):
-			wdg=self.content.layout().itemAt(idx).widget()
+			wdg=self.content.layout().takeAt(idx).widget()
 			if wdg!=None:
-				wdg.setParent(None)
+				wdg.deleteLater()
+			#	wdg.setParent(None)
 	#def clean
 #class QFlowTouchWidget
 
