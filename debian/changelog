@@ -1,3 +1,9 @@
+python3-qtextrawidgets (0.5.2.5-0llx25) noble; urgency=medium
+
+  * Improve clean widgets of QFLowLayout
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 16 May 2025 06:36:10 +0200
+
 python3-qtextrawidgets (0.5.2.4-0llx25) noble; urgency=medium
 
   * Sync with jammy
