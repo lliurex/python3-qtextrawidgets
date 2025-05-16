@@ -117,6 +117,7 @@ class QFlowTouchWidget(QScrollArea):
 		self.content = QWidget(self)
 		self.setWidget(self.content)
 		self.flowLayout=_layout(self.content)
+		self.cleaning=False
 	#def __init__
 
 	def addWidget(self, item):
@@ -124,6 +125,8 @@ class QFlowTouchWidget(QScrollArea):
 	#def addWidget
 	
 	def addItem(self, item):
+		if self.cleaning==True:
+			return
 		self.flowLayout.addItem(item)
 	#def addItem
 
@@ -164,11 +167,12 @@ class QFlowTouchWidget(QScrollArea):
 	#def minimumSize
 
 	def clean(self):
+		self.cleaning=True
 		for idx in reversed(range(0,self.content.layout().count())):
-			wdg=self.content.layout().takeAt(idx).widget()
+			wdg=self.flowLayout.takeAt(idx).widget()
 			if wdg!=None:
 				wdg.deleteLater()
-			#	wdg.setParent(None)
+		self.cleaning=False
 	#def clean
 #class QFlowTouchWidget
 
