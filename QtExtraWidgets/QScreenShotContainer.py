@@ -49,20 +49,24 @@ class _loadScreenShot(QThread):
 
 	def run(self,*args):
 		img=None
-		stripName=''.join(ch for ch in os.path.basename(self.img) if ch.isalnum())
-		MAX=96
-		if (len(stripName)-96>0):
-			stripName=os.path.basename(stripName[len(stripName)-96:])
-		icn=QtGui.QIcon.fromTheme("image-x-generic")
-		pxm=icn.pixmap(512,512)
-		fPath=""
-		if os.path.exists(self.img):
-			pxm=QtGui.QPixmap()
-			try:
-				pxm.load(self.img)
-				img=True
-			except Exception as e:
-				print("Loading cache pixmap: {}".format(e))
+		if isinstance(self.img,QtGui.QPixmap):
+			pxm=self.img
+			img=True
+		elif isinstance(self.img,str):
+			stripName=''.join(ch for ch in os.path.basename(self.img) if ch.isalnum())
+			MAX=96
+			if (len(stripName)-96>0):
+				stripName=os.path.basename(stripName[len(stripName)-96:])
+			icn=QtGui.QIcon.fromTheme("image-x-generic")
+			pxm=icn.pixmap(512,512)
+			fPath=""
+			if os.path.exists(self.img):
+				pxm=QtGui.QPixmap()
+				try:
+					pxm.load(self.img)
+					img=True
+				except Exception as e:
+					print("Loading cache pixmap: {}".format(e))
 		elif self.cacheDir:
 			fPath=os.path.join(self.cacheDir,stripName)#self.img.split('/')[-1])
 			if os.path.isfile(fPath)==True:
@@ -168,7 +172,6 @@ class QScreenShotContainer(QWidget):
 		selectedImg=""
 		arrayImg=[]
 		for btnImg,img in self.btnImg.items():
-			print(type(btnImg))
 			if isinstance(btnImg,QPushButton)==False:
 				continue
 			lbl=QLabel()
