@@ -172,14 +172,18 @@ class QScreenShotContainer(QWidget):
 	def _carrousel(self,btn="",w=0,h=0):
 		dlg=QDialog()	
 		dlg.setModal(True)
-		if (w==0) or (h==0):
-			#sizeObject = QDesktopWidget().screenGeometry(-1) #PySide2
-			qscr=QtGui.QScreen()
-			sizeObject = qscr.availableGeometry() #PySide6
-			w=int(sizeObject.width()/2)
-			h=int(sizeObject.height()/2)
-		xSize=w
-		ySize=h
+		#if (w==0) or (h==0):
+		#	#sizeObject = QDesktopWidget().screenGeometry(-1) #PySide2
+		#	qscr=QtGui.QScreen()
+		#	sizeObject = qscr.size() #PySide6
+		#	print(sizeObject)
+		#	w=int(sizeObject.width()/2)
+		#	h=int(sizeObject.height()/2)
+		#Workaround for size. Set size between 512<>980
+		xSize=512
+		maxWidth=980
+		ySize=512
+		sizes=[]
 		self.widget=self._initWidget()
 		mainLay=QGridLayout()
 		mainLay.setHorizontalSpacing(0)
@@ -188,12 +192,19 @@ class QScreenShotContainer(QWidget):
 		for btnImg,img in self.btnImg.items():
 			if isinstance(btnImg,QPushButton)==False:
 				continue
+			sizes.append(img.size().width())
 			lbl=QLabel()
 			lbl.setPixmap(img.scaled(xSize,ySize,Qt.AspectRatioMode.KeepAspectRatio,Qt.TransformationMode.SmoothTransformation))
 			if btnImg==btn:	
 				selectedImg=lbl
 			else:
 				arrayImg.append(lbl)
+		sizes.sort()
+		for size in sizes:
+			if size>xSize:
+				if size<=maxWidth:
+					xSize=size
+					ySize=(size*ySize)/xSize
 		if selectedImg:
 			self._addImgToWidget(selectedImg,xSize,ySize)
 		for lbl in arrayImg:
