@@ -1,4 +1,4 @@
-python3-qtextrawidgets (0.5.2.5-0llx25) noble; urgency=medium
+python3-qtextrawidgets (0.5.2.6-0llx25) noble; urgency=medium
 
   * Improve clean widgets of QFLowLayout
 
