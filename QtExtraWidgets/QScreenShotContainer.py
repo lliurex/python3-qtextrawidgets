@@ -51,14 +51,17 @@ class _loadScreenShot(QThread):
 
 	def run(self,*args):
 		gotImg=False
+		pxm=None
+		stripName=""
 		if isinstance(self.img,QtGui.QPixmap):
 			pxm=self.img
-			img=True
+			gotImg=True
 		elif isinstance(self.img,str):
+			#Only alnum
 			stripName=''.join(ch for ch in os.path.basename(self.img) if ch.isalnum())
 			MAX=96
-			if (len(stripName)-96>0):
-				stripName=os.path.basename(stripName[len(stripName)-96:])
+			if (len(stripName)>MAX):
+				stripName=os.path.basename(stripName[len(stripName)-MAX:])
 			icn=QtGui.QIcon.fromTheme("image-x-generic")
 			pxm=icn.pixmap(512,512)
 			fPath=""
@@ -66,10 +69,10 @@ class _loadScreenShot(QThread):
 				pxm=QtGui.QPixmap()
 				try:
 					pxm.load(self.img)
-					img=True
+					gotImg=True
 				except Exception as e:
 					print("Loading cache pixmap: {}".format(e))
-		elif self.cacheDir:
+		if self.cacheDir and gotImg==False:
 			fPath=os.path.join(self.cacheDir,stripName)#self.img.split('/')[-1])
 			if os.path.isfile(fPath)==True:
 				pxm=QtGui.QPixmap()
@@ -91,14 +94,14 @@ class _loadScreenShot(QThread):
 			except Exception as e:
 				gotImg=False
 				print("Screenshot request: {}".format(e))
-		if gotImg==True:
+		if gotImg==True and isinstance(self.img,str): #Save the img
 			if self.cacheDir:
 				if fPath=="":
 					fPath=os.path.join(self.cacheDir,stripName)
 				if not os.path.exists(fPath):
 					pxm=pxm.scaled(256,256,Qt.AspectRatioMode.KeepAspectRatio,Qt.TransformationMode.SmoothTransformation)
-					p=pxm.save(fPath,"PNG")#,quality=5)
-		else:
+					pxm.save(fPath,"PNG")#,quality=5)
+		elif pxm==None:
 			#Load generic pixmap
 			icn=QtGui.QIcon.fromTheme("image-x-generic")
 			pxm=icn.pixmap(256,256)
@@ -146,7 +149,7 @@ class QScreenShotContainer(QWidget):
 	def _initWidget(self):
 		widget=QTableTouchWidget.QTableTouchWidget()
 		widget.setRowCount(1)
-		widget.setShowGrid(True)
+		widget.setShowGrid(False)
 		widget.verticalHeader().hide()
 		widget.horizontalHeader().hide()
 		widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -231,7 +234,7 @@ class QScreenShotContainer(QWidget):
 		mainLay.addWidget(btnClose,0,2,1,1,Qt.AlignTop|Qt.AlignRight)
 		mainLay.addWidget(btnNext,0,2,1,1,Qt.AlignLeft)
 		dlg.setLayout(mainLay)
-		dlg.setFixedSize(xSize+(0.1*xSize),ySize+(0.1*ySize))
+		dlg.setFixedSize(xSize*1.21,ySize*1.1)
 		dlg.exec()
 	#def carrousel
 	
