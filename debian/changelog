@@ -1,3 +1,9 @@
+python3-qtextrawidgets (0.5.2.6-0llx23) jammy; urgency=medium
+
+  * Sync with noble
+
+ -- Juanma1980 <juanma1980@gmail.com>  Tue, 27 May 2025 09:20:22 +0200
+
 python3-qtextrawidgets (0.5.2.4-0llx23) jammy; urgency=medium
 
   * Add QFlowTouchWidget: scroll, touch-compatible and flow layout
