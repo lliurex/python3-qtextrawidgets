@@ -187,7 +187,7 @@ class QStackedWindow(QWidget):
 	def _getDesktopFromIcon(self,icon,ficon):
 		self._debug("Search desktop for icon: {} (name: {})".format(icon,icon.name()))
 		iconName=icon.name()
-		if icon.isNull():
+		if icon.isNull() and isinstance(ficon,str):
 			iconName=os.path.basename(ficon)
 		desktopPaths=["/usr/share/applications",os.path.join(os.environ["HOME"],".local","share","applications")]
 		dFile=""
