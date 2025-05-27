@@ -1,11 +1,12 @@
-from PySide2.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QHBoxLayout,QDialog,QAbstractItemView,QGridLayout,QTableWidgetItem,QDesktopWidget
+from PySide2.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QHBoxLayout,QDialog,QAbstractItemView,QGridLayout,QTableWidgetItem
 from PySide2 import QtGui
 from PySide2.QtCore import Qt,Signal,QEvent,QThread,QSize
 from QtExtraWidgets import QTableTouchWidget
 import os,requests
+from functools import partial
 
 class _loadScreenShot(QThread):
-	imageLoaded=Signal("PyObject")
+	imageReady=Signal("PyObject")
 	def __init__(self,*args):
 		super().__init__()
 		self.img=args[0]
@@ -13,7 +14,7 @@ class _loadScreenShot(QThread):
 		self.dbg=False
 		if len(args)>1:
 			self.setCacheDir(args[1])
-		self.destroyed.connect(self._clean)
+		self.destroyed.connect(partial(self._clean,self.__dict__))
 	#def __init__
 
 	def _debug(self,msg):
@@ -21,8 +22,9 @@ class _loadScreenShot(QThread):
 			print("{}".format(msg))
 	#def _debug
 
-	def _clean(self):
-		self.quit()
+	@staticmethod
+	def _clean(*args):
+		pass
 	#def _clean
 	
 	def setCacheDir(self,cacheDir):
@@ -48,38 +50,62 @@ class _loadScreenShot(QThread):
 	#def setCacheDir
 
 	def run(self,*args):
-		img=None
-		stripName=''.join(ch for ch in self.img if ch.isalnum())
-		MAX=96
-		if (len(stripName)-96>0):
-			stripName=stripName[len(stripName)-96:]
-		icn=QtGui.QIcon.fromTheme("image-x-generic")
-		pxm=icn.pixmap(512,512)
-		fPath=""
-		if self.cacheDir:
+		gotImg=False
+		pxm=None
+		stripName=""
+		if isinstance(self.img,QtGui.QPixmap):
+			pxm=self.img
+			gotImg=True
+		elif isinstance(self.img,str):
+			#Only alnum
+			stripName=''.join(ch for ch in os.path.basename(self.img) if ch.isalnum())
+			MAX=96
+			if (len(stripName)>MAX):
+				stripName=os.path.basename(stripName[len(stripName)-MAX:])
+			icn=QtGui.QIcon.fromTheme("image-x-generic")
+			pxm=icn.pixmap(512,512)
+			fPath=""
+			if os.path.exists(self.img):
+				pxm=QtGui.QPixmap()
+				try:
+					pxm.load(self.img)
+					gotImg=True
+				except Exception as e:
+					print("Loading cache pixmap: {}".format(e))
+		if self.cacheDir and gotImg==False:
 			fPath=os.path.join(self.cacheDir,stripName)#self.img.split('/')[-1])
 			if os.path.isfile(fPath)==True:
 				pxm=QtGui.QPixmap()
 				try:
 					pxm.load(fPath)
-					img=True
+					gotImg=True
 				except Exception as e:
 					print("Loading cache pixmap: {}".format(e))
-		if img==None:
+		if gotImg==False and self.img!="":
 			try:
-				img=requests.get(self.img)
-				pxm.loadFromData(img.content)
+				if ("://") in self.img:
+					img=requests.get(self.img,timeout=2)
+					pxm.loadFromData(img.content)
+					gotImg=True
+				else:
+					icn=QtGui.QIcon.fromTheme("image-x-generic")
+					pxm=icn.pixmap(512,512)
+					gotImg=True
 			except Exception as e:
-				img=None
-				print("request: {}".format(e))
-		if img:
+				gotImg=False
+				print("Screenshot request: {}".format(e))
+		if gotImg==True and isinstance(self.img,str): #Save the img
 			if self.cacheDir:
 				if fPath=="":
 					fPath=os.path.join(self.cacheDir,stripName)
 				if not os.path.exists(fPath):
 					pxm=pxm.scaled(256,256,Qt.AspectRatioMode.KeepAspectRatio,Qt.TransformationMode.SmoothTransformation)
-					p=pxm.save(fPath,"PNG")#,quality=5)
-		self.imageLoaded.emit(pxm)
+					pxm.save(fPath,"PNG")#,quality=5)
+		elif pxm==None:
+			#Load generic pixmap
+			icn=QtGui.QIcon.fromTheme("image-x-generic")
+			pxm=icn.pixmap(256,256)
+		self.imageReady.emit(pxm)
 		return True
 	#def run
 #class _loadScreenShot
@@ -100,6 +126,7 @@ class QScreenShotContainer(QWidget):
 		self.cacheDir=None
 		self.th=[]
 		self.btnImg={}
+		self.destroyed.connect(partial(QScreenShotContainer._cleanThreads,self.__dict__))
 	#def __init__
 
 	def setCacheDir(self,cacheDir):
@@ -122,7 +149,7 @@ class QScreenShotContainer(QWidget):
 	def _initWidget(self):
 		widget=QTableTouchWidget.QTableTouchWidget()
 		widget.setRowCount(1)
-		widget.setShowGrid(True)
+		widget.setShowGrid(False)
 		widget.verticalHeader().hide()
 		widget.horizontalHeader().hide()
 		widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
@@ -148,28 +175,39 @@ class QScreenShotContainer(QWidget):
 	def _carrousel(self,btn="",w=0,h=0):
 		dlg=QDialog()	
 		dlg.setModal(True)
-		if (w==0) or (h==0):
-			sizeObject = QDesktopWidget().screenGeometry(-1)
-			#sizeObject = QtGui.QScreen.geometry()
-			w=int(sizeObject.width()/2)
-			h=int(sizeObject.height()/2)
-		xSize=w
-		ySize=h
+		#if (w==0) or (h==0):
+		#	#sizeObject = QDesktopWidget().screenGeometry(-1) #PySide2
+		#	qscr=QtGui.QScreen()
+		#	sizeObject = qscr.size() #PySide2
+		#	print(sizeObject)
+		#	w=int(sizeObject.width()/2)
+		#	h=int(sizeObject.height()/2)
+		#Workaround for size. Set size between 512<>980
+		xSize=512
+		maxWidth=980
+		ySize=512
+		sizes=[]
 		self.widget=self._initWidget()
 		mainLay=QGridLayout()
 		mainLay.setHorizontalSpacing(0)
 		selectedImg=""
 		arrayImg=[]
 		for btnImg,img in self.btnImg.items():
-			print(type(btnImg))
 			if isinstance(btnImg,QPushButton)==False:
 				continue
+			sizes.append(img.size().width())
 			lbl=QLabel()
 			lbl.setPixmap(img.scaled(xSize,ySize,Qt.AspectRatioMode.KeepAspectRatio,Qt.TransformationMode.SmoothTransformation))
 			if btnImg==btn:	
 				selectedImg=lbl
 			else:
 				arrayImg.append(lbl)
+		sizes.sort()
+		for size in sizes:
+			if size>xSize:
+				if size<=maxWidth:
+					xSize=size
+					ySize=(size*ySize)/xSize
 		if selectedImg:
 			self._addImgToWidget(selectedImg,xSize,ySize)
 		for lbl in arrayImg:
@@ -196,7 +234,7 @@ class QScreenShotContainer(QWidget):
 		mainLay.addWidget(btnClose,0,2,1,1,Qt.AlignTop|Qt.AlignRight)
 		mainLay.addWidget(btnNext,0,2,1,1,Qt.AlignLeft)
 		dlg.setLayout(mainLay)
-		dlg.setFixedSize(xSize+(0.1*xSize),ySize+(0.1*ySize))
+		dlg.setFixedSize(xSize*1.21,ySize*1.1)
 		dlg.exec()
 	#def carrousel
 	
@@ -218,11 +256,13 @@ class QScreenShotContainer(QWidget):
 			self.widget.scrollToItem(self.widget.item(visible.row(), column+1))
 	#def scrollContainer(self,*args):
 	
-	def addImage(self,img):
-		scr=_loadScreenShot(img,self.cacheDir)
-		scr.imageLoaded.connect(self._load)
-		scr.start()
+	def addImage(self,img,cacheDir=""):
+		if len(cacheDir)==0:
+			cacheDir=self.cacheDir
+		scr=_loadScreenShot(img,cacheDir)
+		scr.imageReady.connect(self._load)
 		self.th.append(scr)
+		scr.start()
 	#def addImage
 
 	def loadScreenShot(self,img,cacheDir=""):
@@ -247,15 +287,19 @@ class QScreenShotContainer(QWidget):
 	#def load
 
 	def clear(self):
-		self._cleanThreads()
+		for th in self.th:
+			th.quit()
+			th.wait()
 		for i in reversed(range(self.lay.count())): 
 			self.lay.itemAt(i).widget().deleteLater()
 		self.btnImg={}
 	#def clear
 
-	def _cleanThreads(self):
-		for th in self.th:
+	@staticmethod
+	def _cleanThreads(*args):
+		selfDict=args[0]
+		for th in selfDict.get("th",[]):
+			th.quit()
 			th.wait()
-		self.th=[]
 	#def _cleanThreads
 #class QScreenShotContainer
