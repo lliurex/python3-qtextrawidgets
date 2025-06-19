@@ -8,7 +8,7 @@ from queue import Queue
 import traceback
 from PySide6.QtWidgets import QApplication,QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
 from PySide6 import QtGui
-from PySide6.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject
+from PySide6.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject,QSize
 from QtExtraWidgets import QPushInfoButton as qinfo,QTableTouchWidget as qtouch
 import notify2
 QString=type("")
@@ -78,6 +78,7 @@ class QStackedWindow(QWidget):
 
 	def _renderGui(self):
 		lay=QGridLayout()
+		lay.setContentsMargins(1,1,2,1)
 		lay.addWidget(self.lblBanner,0,0,1,2,Qt.AlignCenter)
 		lay.addWidget(self.lstNav,1,0,1,1)
 		self.lstNav.activated.connect(self.setCurrentStack)
@@ -268,6 +269,7 @@ class QStackedWindow(QWidget):
 		icon=QtGui.QIcon.fromTheme(props.get("icon"))
 		self.stkPan.insertWidget(props.get("index"),stack)
 		item=QListWidgetItem(icon,props.get("shortDesc"))
+		self.lstNav.setIconSize(QSize(24,24))
 		item.setToolTip(props.get("tooltip"))
 		idx=props.get("index")
 		item.setData(Qt.UserRole,idx)
