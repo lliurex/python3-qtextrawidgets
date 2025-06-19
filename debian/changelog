@@ -1,3 +1,10 @@
+python3-qtextrawidgets (0.5.2.7-0llx25) noble; urgency=medium
+
+  * QStackedWindow
+  *   Minor upgrade to look&feel
+
+ -- Juanma1980 <juanma1980@gmail.com>  Thu, 19 Jun 2025 13:26:57 +0200
+
 python3-qtextrawidgets (0.5.2.6-0llx25) noble; urgency=medium
 
   * Improve clean widgets of QFLowLayout
