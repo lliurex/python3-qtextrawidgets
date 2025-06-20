@@ -1,3 +1,10 @@
+python3-qtextrawidgets (0.5.2.8-0llx25) noble; urgency=medium
+
+  * QFlowWidget
+  *   Add currentIndex
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 20 Jun 2025 13:32:07 +0200
+
 python3-qtextrawidgets (0.5.2.7-0llx25) noble; urgency=medium
 
   * QStackedWindow
