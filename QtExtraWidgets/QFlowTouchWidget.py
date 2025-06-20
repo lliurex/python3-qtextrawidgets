@@ -27,6 +27,14 @@ class _layout(QLayout):
 		return len(self._itemList)
 	#def count
 
+	def currentIndex(self):
+		idx=0
+		for item in self._itemList:
+			if item.widget().hasFocus()==True:
+				break
+			idx+=1
+		return(idx)
+
 	def itemAt(self, index):
 		if 0 <= index < len(self._itemList):
 			return self._itemList[index]
@@ -135,6 +143,10 @@ class QFlowTouchWidget(QScrollArea):
 	def count(self):
 		return(self.flowLayout.count())
 	#def count
+
+	def currentIndex(self):
+		return self.flowLayout.currentIndex()
+	#def currentIndex
 
 	def itemAt(self, index):
 		return self.flowLayout.itemAt(index)
