@@ -64,6 +64,8 @@ class _loadScreenShot(QThread):
 				stripName=os.path.basename(stripName[len(stripName)-MAX:])
 			icn=QtGui.QIcon.fromTheme("image-x-generic")
 			pxm=icn.pixmap(512,512)
+			if stripName.endswith("png"):
+				stripName=stripName.replace("png",".png")
 			fPath=""
 			if os.path.exists(self.img):
 				pxm=QtGui.QPixmap()
