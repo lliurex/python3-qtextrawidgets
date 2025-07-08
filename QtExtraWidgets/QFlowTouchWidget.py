@@ -31,9 +31,11 @@ class _layout(QLayout):
 		return(self._previousItem)
 	#def previousItem
 
-	def setCurrentItem(self,item):
-		self._previousItem=self._currentItem
+	def setCurrentItem(self,item,force=False):
+		if item!=self._currentItem and force==True:
+			self._previousItem=self._currentItem
 		self._currentItem=item
+		self._currentItem.setFocus()
 		self._currentIndex=self.indexOf(self._currentItem)
 		self.currentItemChanged.emit(self._previousItem,self._currentItem)
 	#def setCurrentItem
@@ -48,7 +50,10 @@ class _layout(QLayout):
 	def eventFilter(self,*args,**kwargs):
 		events=[QEvent.Type.Enter,QEvent.Type.FocusIn]
 		if (args[1].type() in events) and args[0]!=None:
-			self.setCurrentItem(args[0])
+			force=False
+			if args[1].type()==QEvent.Type.Enter:
+				force=True
+			self.setCurrentItem(args[0],force)
 		return(False)
 	#def eventFilter
 
