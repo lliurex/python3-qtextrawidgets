@@ -1,3 +1,11 @@
+python3-qtextrawidgets (0.5.2.9-0llx23) jammy; urgency=medium
+
+  * QFlowTable:
+  *  Add current and previous items
+  *  WIP on currentItemChanged signal
+
+ -- Juanma1980 <juanma1980@gmail.com>  Tue, 08 Jul 2025 10:25:45 +0200
+
 python3-qtextrawidgets (0.5.2.8-0llx23) jammy; urgency=medium
 
   * Sync with noble
