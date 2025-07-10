@@ -1,8 +1,8 @@
 #### FROM FlowLayout QT EXAMPLES ####
 
-from PySide2.QtWidgets import QScroller,QScrollerProperties,QWidget,QAbstractItemView,QLayout,QLabel,QSizePolicy,QScrollArea
-from PySide2.QtCore import Qt,QSize,QRect,QPoint,QEvent,Property,Signal
-import PySide2
+from PySide6.QtWidgets import QScroller,QScrollerProperties,QWidget,QAbstractItemView,QLayout,QLabel,QSizePolicy,QScrollArea
+from PySide6.QtCore import Qt,QSize,QRect,QPoint,QEvent,Property,Signal
+import PySide6
 
 class _layout(QLayout):
 	currentItemChanged=Signal("PyObject","PyObject")
