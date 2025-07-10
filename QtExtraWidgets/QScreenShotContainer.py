@@ -178,7 +178,7 @@ class QScreenShotContainer(QWidget):
 		dlg=QDialog()	
 		dlg.setModal(True)
 		#if (w==0) or (h==0):
-		#	#sizeObject = QDesktopWidget().screenGeometry(-1) #PySide2
+		#	#sizeObject = QDesktopWidget().screenGeometry(-1) #PySide6
 		#	qscr=QtGui.QScreen()
 		#	sizeObject = qscr.size() #PySide6
 		#	print(sizeObject)

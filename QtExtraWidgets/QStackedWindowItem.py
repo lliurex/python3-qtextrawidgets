@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from functools import partial
 import traceback
 from PySide6.QtWidgets import QDialog,QWidget,QVBoxLayout,QHBoxLayout,QPushButton,QGridLayout,QLabel,QPushButton,QLineEdit,\
 	QRadioButton,QCheckBox,QComboBox,QTableWidget,QSlider,QScrollArea,QMessageBox,QCalendarWidget
@@ -19,6 +20,7 @@ except:
 
 class QStackedWindowItem(QWidget):
 	updated=Signal()
+	destroyed=Signal()
 	def __init__(self,*args,**kwargs):
 		super().__init__(*args,**kwargs)
 		if kwargs.get("parent","")!="":
@@ -50,7 +52,12 @@ class QStackedWindowItem(QWidget):
 		self.__init_stack__()
 		self.updateScreen=self.decoratorUpdateScreen(self.updateScreen)
 		self.__initScreen__=self.decoratorInitScreen(self.__initScreen__)
+		self.destroyed.connect(partial(QStackedWindowItem._onDestroy,self.__dict__))
 	#def __init__
+
+	@staticmethod
+	def _onDestroy(*args):
+		selfDict=args[0]
 
 	def __init_stack__(self):
 		raise NotImplementedError("__init_stack not implemented")
@@ -103,7 +110,6 @@ class QStackedWindowItem(QWidget):
 				align=Qt.AlignBottom|Qt.AlignRight
 				if self.btnAccept.isEnabled()==False:
 					idx=0
-				print(self.btnAccept.isEnabled())
 				if isinstance(layout,QGridLayout):
 					layout.addLayout(box_btns,idx,0,1,layout.columnCount(),Qt.AlignTop|Qt.AlignRight)
 				elif isinstance(layout,QVBoxLayout) or isinstance(layout,QHBoxLayout):

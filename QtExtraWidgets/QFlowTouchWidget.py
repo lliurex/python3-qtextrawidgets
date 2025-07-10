@@ -1,13 +1,18 @@
 #### FROM FlowLayout QT EXAMPLES ####
 
 from PySide6.QtWidgets import QScroller,QScrollerProperties,QWidget,QAbstractItemView,QLayout,QLabel,QSizePolicy,QScrollArea
-from PySide6.QtCore import Qt,QSize,QRect,QPoint
+from PySide6.QtCore import Qt,QSize,QRect,QPoint,QEvent,Property,Signal
 import PySide6
 
 class _layout(QLayout):
+	currentItemChanged=Signal("PyObject","PyObject")
 	def __init__(self, parent=None):
 		super().__init__(parent)
+		self._previousItem=None
+		self._currentItem=None
+		self._currentIndex=-1
 		self._itemList = []
+		self._widgetList = []
 		if parent is not None:
 			self.setContentsMargins(0, 0, 0, 0)
 	#def __init__
@@ -18,22 +23,59 @@ class _layout(QLayout):
 			item = self.takeAt(0)
 	#def __del__
 
+	def currentItem(self):
+		return(self._currentItem)
+	#def currentItem
+
+	def previousItem(self):
+		return(self._previousItem)
+	#def previousItem
+
+	def setCurrentItem(self,item,force=False):
+		if item!=self._currentItem and force==True:
+			self._previousItem=self._currentItem
+		self._currentItem=item
+		self._currentItem.setFocus()
+		self._currentIndex=self.indexOf(self._currentItem)
+		self.currentItemChanged.emit(self._previousItem,self._currentItem)
+	#def setCurrentItem
+
 	def addItem(self, item):
 		if item!=None:
 			self._itemList.append(item)
+			self._widgetList.append(item.widget())
+			item.widget().installEventFilter(self)
 	#def addItem
+
+	def eventFilter(self,*args,**kwargs):
+		events=[QEvent.Type.Enter,QEvent.Type.FocusIn]
+		if (args[1].type() in events) and args[0]!=None:
+			force=False
+			if args[1].type()==QEvent.Type.Enter:
+				force=True
+			self.setCurrentItem(args[0],force)
+		return(False)
+	#def eventFilter
 
 	def count(self):
 		return len(self._itemList)
 	#def count
 
 	def currentIndex(self):
-		idx=0
-		for item in self._itemList:
-			if item.widget().hasFocus()==True:
-				break
-			idx+=1
+		return(self._currentIndex)
+	#def currentIndex
+
+	def indexOf(self,item):
+		try:
+			idx=self._itemList.index(item)
+		except:
+			try:
+				idx=self._widgetList.index(item)
+			except Exception as e:
+				print(e)
+				idx=-1
 		return(idx)
+	#def indexOf
 
 	def itemAt(self, index):
 		if 0 <= index < len(self._itemList):
@@ -126,6 +168,7 @@ class QFlowTouchWidget(QScrollArea):
 		self.setWidget(self.content)
 		self.flowLayout=_layout(self.content)
 		self.cleaning=False
+
 	#def __init__
 
 	def addWidget(self, item):
@@ -143,6 +186,14 @@ class QFlowTouchWidget(QScrollArea):
 	def count(self):
 		return(self.flowLayout.count())
 	#def count
+
+	def currentItem(self):
+		return self.flowLayout.currentItem()
+	#def currentIndex
+
+	def previousItem(self):
+		return self.flowLayout.previousItem()
+	#def currentIndex
 
 	def currentIndex(self):
 		return self.flowLayout.currentIndex()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+from functools import partial
 import os
 import importlib
 import inspect
@@ -67,9 +68,20 @@ class QStackedWindow(QWidget):
 		self.stkPan=QStackedWidget()
 		self.rsrc="/usr/share/appconfig"
 		self.notify=notify2
+		self.destroyed.connect(partial(QStackedWindow._onDestroy,self.__dict__))
 		self._renderGui()
 		self.showPortrait()
 	#def init
+
+	@staticmethod
+	def _onDestroy(*args):
+		selfDict=args[0]
+		if "stkPan" in selfDict:
+			for c in range(0,selfDict["stkPan"].count()):
+				w=selfDict["stkPan"].widget(c)
+				selfDict["stkPan"].removeWidget(w)
+				w.deleteLater()
+	#def _onDestroy
 	
 	def _debug(self,msg):
 		if self.dbg:
@@ -188,7 +200,7 @@ class QStackedWindow(QWidget):
 	def _getDesktopFromIcon(self,icon,ficon):
 		self._debug("Search desktop for icon: {} (name: {})".format(icon,icon.name()))
 		iconName=icon.name()
-		if icon.isNull():
+		if icon.isNull() and isinstance(ficon,str):
 			iconName=os.path.basename(ficon)
 		desktopPaths=["/usr/share/applications",os.path.join(os.environ["HOME"],".local","share","applications")]
 		dFile=""
