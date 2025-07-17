@@ -152,9 +152,9 @@ class QKdeConfigWidget(QWidget):
 					if value!="true":
 						state=False
 					wdg.setChecked(state)
-				elif hasattr(wdg,"setCurrentIndex"):
+				elif hasattr(wdg,"setCurrentIndex") and value.isnumeric():
 					wdg.setCurrentIndex(int(value))
-				elif hasattr(wdg,"setValue"):
+				elif hasattr(wdg,"setValue") and value.isnumeric():
 					wdg.setValue(int(value))
 				elif hasattr(wdg,"setText"):
 					wdg.setText(value)
