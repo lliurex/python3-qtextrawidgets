@@ -1,3 +1,12 @@
+python3-qtextrawidgets (0.5.2.11-0llx23) jammy; urgency=medium
+
+  * QStackedWindow:
+  *  Fix trying to delete already deleted window
+  * QSearchBox
+  *  Fix layout when history disabled
+
+ -- Juanma1980 <juanma1980@gmail.com>  Sat, 19 Jul 2025 16:36:54 +0200
+
 python3-qtextrawidgets (0.5.2.10-0llx23) jammy; urgency=medium
 
   * QKConfigWiidget:
