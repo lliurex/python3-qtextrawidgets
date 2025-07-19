@@ -80,7 +80,8 @@ class QStackedWindow(QWidget):
 			for c in range(0,selfDict["stkPan"].count()):
 				w=selfDict["stkPan"].widget(c)
 				selfDict["stkPan"].removeWidget(w)
-				w.deleteLater()
+				if w!=None:
+					w.deleteLater()
 	#def _onDestroy
 	
 	def _debug(self,msg):
