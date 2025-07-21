@@ -1,15 +1,17 @@
 python3-qtextrawidgets (0.5.2.11-0llx23) jammy; urgency=medium
 
   * QStackedWindow:
-  *  Fix trying to delete already deleted window
+  *  Fix trying to delete an already deleted window
   * QSearchBox
-  *  Fix layout when history disabled
+  *  Fix layout when history option is disabled
+  * QKdeConfigWidget:
+  *  Add support for hex colors in config
 
  -- Juanma1980 <juanma1980@gmail.com>  Sat, 19 Jul 2025 16:36:54 +0200
 
 python3-qtextrawidgets (0.5.2.10-0llx23) jammy; urgency=medium
 
-  * QKConfigWiidget:
+  * QKdeConfigWidget:
   *  Fix use value as int only if int
 
  -- Juanma1980 <juanma1980@gmail.com>  Thu, 17 Jul 2025 12:51:42 +0200
