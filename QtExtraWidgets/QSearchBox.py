@@ -21,16 +21,9 @@ class QSearchBox(QWidget):
 		lay.setSpacing(0)
 		if self.history==True:
 			self.cmbSearch=QComboBox()
-			self.cmbSearch.setEditable(True)
-			self.cmbSearch.currentIndexChanged.connect(self._emitClick)
-			self.txtSearch=self.cmbSearch.lineEdit()
-			self.txtSearch.setAlignment(Qt.AlignTop)
-			lay.addWidget(self.cmbSearch,Qt.Alignment(-1))
 		else:
 			self.txtSearch=QLineEdit()
-			lay.addWidget(self.txtSearch,Qt.Alignment(-1))
 		self.txtSearch.setObjectName("search")
-		self.txtSearch.setFrame(False)
 		self.txtSearch.setTextMargins(0,0,0,0)
 		self.txtSearch.editingFinished.connect(self._emitEdit)
 		self.txtSearch.returnPressed.connect(self._emitReturn)
@@ -41,8 +34,17 @@ class QSearchBox(QWidget):
 		self.btnSearch.setIcon(icn)
 		self.btnSearch.setIconSize(QSize(24,24))
 		if hasattr(self,"cmbSearch"):
+			self.txtSearch.setFrame(False)
 			self.cmbSearch.setMinimumHeight(self.btnSearch.sizeHint().height())
-		lay.addWidget(self.btnSearch,Qt.AlignLeft|Qt.Alignment(0))
+			self.cmbSearch.setEditable(True)
+			self.cmbSearch.currentIndexChanged.connect(self._emitClick)
+			self.txtSearch=self.cmbSearch.lineEdit()
+			self.txtSearch.setAlignment(Qt.AlignTop)
+			lay.addWidget(self.cmbSearch,Qt.Alignment(-1))
+			lay.addWidget(self.btnSearch,Qt.AlignLeft|Qt.Alignment(0))
+		else:
+			lay.addWidget(self.txtSearch,Qt.Alignment(1))
+			lay.addWidget(self.btnSearch,Qt.Alignment(0))
 		self.setLayout(lay)
 	#def __init__
 

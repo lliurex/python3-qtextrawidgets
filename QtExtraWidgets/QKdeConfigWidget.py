@@ -138,8 +138,11 @@ class QKdeConfigWidget(QWidget):
 				if isinstance(wdg,QPushButton):
 					hasKcolor=wdg.property("color")
 					if hasKcolor!=None:
-						kcolor=value.split(",")
-						newcolor=QColor.fromRgb(int(kcolor[0]),int(kcolor[1]),int(kcolor[2]))
+						if value.startswith("#"):
+							newcolor=QColor(value)
+						elif "," in value:
+							kcolor=value.split(",")
+							newcolor=QColor.fromRgb(int(kcolor[0]),int(kcolor[1]),int(kcolor[2]))
 						wdg.setProperty("color",newcolor)
 					wdg.setText(value)
 				elif hasattr(wdg,"checkState"):
@@ -152,9 +155,9 @@ class QKdeConfigWidget(QWidget):
 					if value!="true":
 						state=False
 					wdg.setChecked(state)
-				elif hasattr(wdg,"setCurrentIndex"):
+				elif hasattr(wdg,"setCurrentIndex") and value.isnumeric():
 					wdg.setCurrentIndex(int(value))
-				elif hasattr(wdg,"setValue"):
+				elif hasattr(wdg,"setValue") and value.isnumeric():
 					wdg.setValue(int(value))
 				elif hasattr(wdg,"setText"):
 					wdg.setText(value)
