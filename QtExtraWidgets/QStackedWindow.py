@@ -235,6 +235,8 @@ class QStackedWindow(QWidget):
 				break
 		if dFile=="":
 			for dpath in desktopPaths:
+				if os.path.exists(dpath)==False:
+					continue
 				for fpath in os.scandir(dpath):
 					if fpath.is_file()==False:
 						continue
