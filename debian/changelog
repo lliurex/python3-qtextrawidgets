@@ -1,3 +1,9 @@
+python3-qtextrawidgets (0.5.2.11-0llx25) noble; urgency=medium
+
+  * Sync with jammy
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 25 Jul 2025 06:12:18 +0200
+
 python3-qtextrawidgets (0.5.2.9-0llx25) noble; urgency=medium
 
   * Sync with jammy
