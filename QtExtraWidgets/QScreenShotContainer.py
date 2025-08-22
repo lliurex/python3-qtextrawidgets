@@ -11,7 +11,7 @@ class _loadScreenShot(QThread):
 		super().__init__()
 		self.img=args[0]
 		self.cacheDir=None
-		self.dbg=False
+		self.dbg=True
 		if len(args)>1:
 			self.setCacheDir(args[1])
 		self.destroyed.connect(partial(self._clean,self.__dict__))
@@ -90,7 +90,7 @@ class _loadScreenShot(QThread):
 					pxm.loadFromData(img.content)
 					gotImg=True
 				else:
-					icn=QtGui.QIcon.fromTheme("image-x-generic")
+					icn=QtGui.QIcon.fromTheme(os.path.basename(self.img))
 					pxm=icn.pixmap(512,512)
 					gotImg=True
 			except Exception as e:
@@ -155,7 +155,6 @@ class QScreenShotContainer(QWidget):
 		widget.verticalHeader().hide()
 		widget.horizontalHeader().hide()
 		widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-		widget.setRowCount(1)
 		return(widget)
 	#def _initWidget(self):
 
