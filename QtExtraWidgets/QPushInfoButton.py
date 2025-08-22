@@ -33,7 +33,7 @@ class QPushInfoButton(QPushButton):
 
 	def loadImg(self,img):
 		if os.path.isfile(img):
-			icn=QtGui.QPixmap.fromImage(QtGui.QImage(img))
+			icn=QtGui.QPixmap.fromImage(img)
 		elif img!='':
 			if img.startswith("http"):
 				raw=requests.get(img)
