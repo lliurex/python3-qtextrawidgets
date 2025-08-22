@@ -235,8 +235,6 @@ class QStackedWindow(QWidget):
 				break
 		if dFile=="":
 			for dpath in desktopPaths:
-				if os.path.exists(dpath)==False:
-					continue
 				for fpath in os.scandir(dpath):
 					if fpath.is_file()==False:
 						continue
@@ -319,7 +317,14 @@ class QStackedWindow(QWidget):
 						if moduleClass.enabled==False:
 							moduleClass=None
 							continue
-					props=moduleClass.getProps()
+					if hasattr(moduleClass,"getProps"):
+						props=moduleClass.getProps()
+					else:
+						moduleClass=None
+						continue
+					if not hasattr(moduleClass,"__initScreen__"):
+						moduleClass=None
+						continue
 					index=props.get("index",-1)
 		return(index,moduleClass)
 	#def _inspectModule
