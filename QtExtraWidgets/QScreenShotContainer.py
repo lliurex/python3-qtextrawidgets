@@ -63,7 +63,6 @@ class _loadScreenShot(QThread):
 			if (len(stripName)>MAX):
 				stripName=os.path.basename(stripName[len(stripName)-MAX:])
 			icn=QtGui.QIcon.fromTheme("image-x-generic")
-			pxm=icn.pixmap(512,512)
 			if stripName.endswith("png"):
 				stripName=stripName.replace("png",".png")
 			fPath=""
@@ -85,6 +84,7 @@ class _loadScreenShot(QThread):
 					print("Loading cache pixmap: {}".format(e))
 		if gotImg==False and self.img!="":
 			try:
+				pxm=QtGui.QPixmap()
 				if ("://") in self.img:
 					img=requests.get(self.img,timeout=2)
 					pxm.loadFromData(img.content)
@@ -284,15 +284,15 @@ class QScreenShotContainer(QWidget):
 				self.btnImg["btn"].setIconSize(QSize(128,128))
 				self.scroll.setFixedHeight(self.btnImg["btn"].sizeHint().height()+32)
 				self.btnImg["btn"].installEventFilter(self)
-				self.btnImg["btn"].show()
+				#self.btnImg["btn"].show()
 	#def load
 
 	def clear(self):
+		for i in reversed(range(self.lay.count())): 
+			self.lay.itemAt(i).widget().deleteLater()
 		for th in self.th:
 			th.quit()
 			th.wait()
-		for i in reversed(range(self.lay.count())): 
-			self.lay.itemAt(i).widget().deleteLater()
 		self.btnImg={}
 	#def clear
 
