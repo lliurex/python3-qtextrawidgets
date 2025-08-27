@@ -86,6 +86,7 @@ class _layout(QLayout):
 				for cItem,cWdg in self._cache.items():
 					if cWdg==item:
 						idx=list(self._cache.keys()).index(cItem)
+						break
 		except Exception as e:
 			print(e)
 		return(idx)
@@ -236,45 +237,45 @@ class QFlowTouchWidget(QScrollArea):
 		self.content = QWidget(self)
 		self.setWidget(self.content)
 		self.flowLayout=_layout(self.content,fastMode)
+		self.fastMode=fastMode
 		self.cleaning=False
 
 	#def __init__
 
-	def addWidget(self, item):
-		if self.cleaning==True:
-			return
-		self.flowLayout.addWidget(item)
-	#def addWidget
-	
 	def addItem(self, item):
 		if self.cleaning==True:
 			return
 		self.flowLayout.addItem(item)
 	#def addItem
 
+	def addWidget(self, item):
+		if self.cleaning==True:
+			return
+		self.flowLayout.addWidget(item)
+	#def addWidget
+
+	def clean(self):
+		self.cleaning=True
+		wdg=QWidget()
+		wdg.setLayout(self.content.layout())
+		self.content._itemList = []
+		self.content._widgetList = []
+		wdg.deleteLater()
+		self.flowLayout=_layout(self.content,self.fastMode)
+		self.cleaning=False
+	#def clean
+	
 	def count(self):
 		return(self.flowLayout.count())
 	#def count
-
-	def currentItem(self):
-		return self.flowLayout.currentItem()
-	#def currentIndex
-
-	def previousItem(self):
-		return self.flowLayout.previousItem()
-	#def currentIndex
 
 	def currentIndex(self):
 		return self.flowLayout.currentIndex()
 	#def currentIndex
 
-	def itemAt(self, index):
-		return self.flowLayout.itemAt(index)
-	#def itemAt
-
-	def takeAt(self, index):
-		return(self.flowLayout.takeAt(index))
-	#def takeAt
+	def currentItem(self):
+		return self.flowLayout.currentItem()
+	#def currentIndex
 
 	def expandingDirections(self):
 		return self.flowLayout.expandingDirections
@@ -288,6 +289,26 @@ class QFlowTouchWidget(QScrollArea):
 		return(self.flowLayout.heightForWidth(width))
 	#def heightForWidth
 
+	def indexOf(self, wdg):
+		return self.flowLayout.indexOf(wdg)
+	#def indexOf
+
+	def itemAt(self, index):
+		return self.flowLayout.itemAt(index)
+	#def itemAt
+
+	def minimumSize(self):
+		return(self.flowLayout.minimumSize())
+	#def minimumSize
+
+	def previousItem(self):
+		return self.flowLayout.previousItem()
+	#def currentIndex
+
+	def takeAt(self, index):
+		return(self.flowLayout.takeAt(index))
+	#def takeAt
+
 	def setGeometry(self, rect):
 		self.setGeometry(rect)
 	#def setGeometry
@@ -295,19 +316,6 @@ class QFlowTouchWidget(QScrollArea):
 	def sizeHint(self):
 		return(self.flowLayout.sizeHint())
 	#def sizeHint
-
-	def minimumSize(self):
-		return(self.flowLayout.minimumSize())
-	#def minimumSize
-
-	def clean(self):
-		self.cleaning=True
-		wdg=QWidget()
-		wdg.setLayout(self.content.layout())
-		wdg.deleteLater()
-		self.flowLayout=_layout(self.content)
-		self.cleaning=False
-	#def clean
 #class QFlowTouchWidget
 
 if __name__=="__main__":
