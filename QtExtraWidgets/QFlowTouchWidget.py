@@ -161,16 +161,21 @@ class _layout(QLayout):
 					self._itemList.remove(item)
 					self._widgetList.remove(item.widget())
 				else:
+					style = item.widget().style()
+					layoutSpacingX = style.layoutSpacing(
+						QSizePolicy.ControlType.PushButton, QSizePolicy.ControlType.PushButton,
+						Qt.Orientation.Horizontal
+					)
 					prevItem=None
+					spacing+=layoutSpacingX
 					if len(itemList)>1:
 						prevItem=itemList[-2].widget()
 						while len(self._itemList)>2:
 							self._cache.update({self._itemList.pop(0):self._widgetList.pop(0)})
 					if prevItem!=None:
-						x = prevItem.x()+item.sizeHint().width()
+						x = prevItem.x()+item.sizeHint().width()+spacing
 						y = prevItem.y()
-						x+=spacing
-					if x>rect.right():
+					if x+item.sizeHint().width()+spacing>rect.right():
 						x=0
 						y = item.sizeHint().height()+y
 						y+=spacing
@@ -202,7 +207,7 @@ class _layout(QLayout):
 			space_x = spacing + layout_spacing_x
 			space_y = spacing + layout_spacing_y
 			next_x = x + item.sizeHint().width() + space_x
-			if next_x - space_x > rect.right() and line_height > 0:
+			if next_x + space_x > rect.right() and line_height > 0:
 				x = rect.x()
 				y = y + line_height + space_y
 				next_x = x + item.sizeHint().width() + space_x
