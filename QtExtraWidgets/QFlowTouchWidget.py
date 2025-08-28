@@ -74,21 +74,18 @@ class _layout(QLayout):
 	#def currentIndex
 
 	def indexOf(self,item):
-		try:
-			if item in self._cache.keys():
-				idx=list(self._cache.keys()).index(item)
-			elif item in self._itemList:
-				idx=self._itemList.index(item)
-			elif item in self._widgetList: 
-				idx=self._widgetList.index(item)
-			else:
-				idx=-1
-				for cItem,cWdg in self._cache.items():
-					if cWdg==item:
-						idx=list(self._cache.keys()).index(cItem)
-						break
-		except Exception as e:
-			print(e)
+		idx=-1
+		if item in self._cache.keys():
+			idx=list(self._cache.keys()).index(item)
+		elif item in self._itemList:
+			idx=self._itemList.index(item)
+		elif item in self._widgetList: 
+			idx=self._widgetList.index(item)
+		else:
+			for cItem,cWdg in self._cache.items():
+				if cWdg==item:
+					idx=list(self._cache.keys()).index(cItem)
+					break
 		return(idx)
 	#def indexOf
 
