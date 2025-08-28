@@ -260,6 +260,7 @@ class QFlowTouchWidget(QScrollArea):
 		wdg.setLayout(self.content.layout())
 		self.content._itemList = []
 		self.content._widgetList = []
+		self.content._cache={}
 		wdg.deleteLater()
 		self.flowLayout=_layout(self.content,self.fastMode)
 		self.cleaning=False
