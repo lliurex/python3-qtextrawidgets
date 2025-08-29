@@ -1,7 +1,7 @@
 #### FROM FlowLayout QT EXAMPLES ####
 
-from PySide6.QtWidgets import QScroller,QScrollerProperties,QWidget,QAbstractItemView,QLayout,QLabel,QSizePolicy,QScrollArea
-from PySide6.QtCore import Qt,QSize,QRect,QPoint,QEvent,Property,Signal
+from PySide6.QtWidgets import QScroller,QWidget,QLayout,QLabel,QSizePolicy,QScrollArea,QApplication
+from PySide6.QtCore import Qt,QSize,QRect,QPoint,QEvent,Signal
 import PySide6
 import time
 
@@ -14,8 +14,6 @@ class _layout(QLayout):
 		self._currentIndex=-1
 		self._itemList = []
 		self._widgetList = []
-		self._cache={}
-		self.oldRect=QRect(0,0,0,0)
 		self.prevItem=None
 		if parent is not None:
 			self.setContentsMargins(0, 0, 0, 0)
@@ -27,8 +25,12 @@ class _layout(QLayout):
 			item = self.takeAt(0)
 			while item:
 				item = self.takeAt(0)
+				self._itemList.remove(item)
+				self._widgetList.remove(item.widget())
+				del item
 		except Exception as e:
 			print(e)
+
 	#def __del__
 
 	def currentItem(self):
@@ -52,7 +54,6 @@ class _layout(QLayout):
 		if item!=None:
 			self._itemList.append(item)
 			self._widgetList.append(item.widget())
-			item.widget().installEventFilter(self)
 	#def addItem
 
 	def eventFilter(self,*args,**kwargs):
@@ -66,7 +67,7 @@ class _layout(QLayout):
 	#def eventFilter
 
 	def count(self):
-		return len(self._itemList)+len(self._cache)
+		return len(self._itemList)
 	#def count
 
 	def currentIndex(self):
@@ -75,46 +76,26 @@ class _layout(QLayout):
 
 	def indexOf(self,item):
 		idx=-1
-		if item in self._cache.keys():
-			idx=list(self._cache.keys()).index(item)
-		elif item in self._itemList:
+		if item in self._itemList:
 			idx=self._itemList.index(item)
 		elif item in self._widgetList: 
 			idx=self._widgetList.index(item)
-		else:
-			for cItem,cWdg in self._cache.items():
-				if cWdg==item:
-					idx=list(self._cache.keys()).index(cItem)
-					break
 		return(idx)
 	#def indexOf
 
 	def itemAt(self, index):
-		try:
-			if 0 <= index < len(self._cache):
-				return list(self._cache.keys())[index]
-			else:
-				index=index-len(self._cache)
-				if 0 <= index < len(self._itemList):
-					return self._itemList[index]
-		except Exception as e:
-			print(e)
+		if 0 <= index < len(self._itemList):
+			return self._itemList[index]
 		return None
 	#def itemAt
 
 	def takeAt(self, index):
-		try:
-			if 0 <= index < len(self._cache):
-				item=list(self._cache.keys())[index]
-				self._cache.pop(item)
-				return(item)
-			else:
-				index=index-len(self._cache.keys())
-				if 0 <= index < len(self._itemList):
-					self._widgetList.pop(index)
-					return self._itemList.pop(index)
-		except Exception as e:
-			print(e)
+		if 0 <= index < len(self._itemList):
+			wdg=self._widgetList.pop(index)
+			item=self._itemList.pop(index)
+			item.widget().setParent(None)
+			self.removeItem(item)
+			return item
 		return None
 	#def takeAt
 
@@ -153,35 +134,35 @@ class _layout(QLayout):
 		y = rect.y()
 		spacing = self.spacing()
 		itemList=self._itemList
-		try:
-			if len(itemList)>0:
-				item=itemList[-1]
-				#if item.widget()!=self.prevItem:
-				if item.widget()==None:
+		if len(itemList)>0:
+			if len(self._itemList)%50==0:
+				time.sleep(0.05)
+			item=itemList[-1]
+			#if item.widget()!=self.prevItem:
+			if item.widget()==None:
+				try:
 					self._itemList.remove(item)
 					self._widgetList.remove(item.widget())
-				else:
-					style = item.widget().style()
-					layoutSpacingX = style.layoutSpacing(
-						QSizePolicy.ControlType.PushButton, QSizePolicy.ControlType.PushButton,
-						Qt.Orientation.Horizontal
-					)
-					prevItem=None
-					spacing+=layoutSpacingX
-					if len(itemList)>1:
-						prevItem=itemList[-2].widget()
-						while len(self._itemList)>2:
-							self._cache.update({self._itemList.pop(0):self._widgetList.pop(0)})
-					if prevItem!=None:
-						x = prevItem.x()+item.sizeHint().width()+spacing
-						y = prevItem.y()
-					if x+item.sizeHint().width()+spacing>rect.right():
-						x=0
-						y = item.sizeHint().height()+y
-						y+=spacing
-					item.setGeometry(QRect(QPoint(x, y), item.sizeHint()))
-		except Exception as e:
-				print(e)
+				except:
+					pass
+			else:
+				style = item.widget().style()
+				layoutSpacingX = style.layoutSpacing(
+					QSizePolicy.ControlType.PushButton, QSizePolicy.ControlType.PushButton,
+					Qt.Orientation.Horizontal
+				)
+				prevItem=None
+				spacing+=layoutSpacingX
+				if len(itemList)>1:
+					prevItem=itemList[-2].widget()
+				if prevItem!=None:
+					x = prevItem.x()+item.sizeHint().width()+spacing
+					y = prevItem.y()
+				if x+item.sizeHint().width()+spacing>rect.right():
+					x=0
+					y = item.sizeHint().height()+y
+					y+=spacing
+				item.setGeometry(QRect(QPoint(x, y), item.sizeHint()))
 		return (y-rect.y())
 	#def _doLayoutFast
 
@@ -247,13 +228,19 @@ class QFlowTouchWidget(QScrollArea):
 	def addItem(self, item):
 		if self.cleaning==True:
 			return
+		item.setParent(self)
 		self.flowLayout.addItem(item)
 	#def addItem
 
 	def addWidget(self, item):
 		if self.cleaning==True:
 			return
+		item.setParent(self)
 		self.flowLayout.addWidget(item)
+		if self.fastMode==True:
+			QApplication.processEvents()
+			if len(self.flowLayout._itemList)%30==0:
+				time.sleep(0.001)
 	#def addWidget
 
 	def clean(self):
@@ -266,6 +253,18 @@ class QFlowTouchWidget(QScrollArea):
 		wdg.deleteLater()
 		self.flowLayout=_layout(self.content,self.fastMode)
 		self.cleaning=False
+		#self.cleaning=True
+		#if self.flowLayout._previousItem!=None:	
+		#	self.flowLayout._previousItem.deleteLater()
+		#if self.flowLayout._currentItem!=None:	
+		#	self.flowLayout._currentItem.deleteLater()
+		#self.flowLayout._itemList=[]
+		#self.flowLayout._widgetList=[]
+		#content = QWidget(self)
+		#self.setWidget(content)
+		#self.flowLayout=None
+		#self.flowLayout=_layout(content,self.fastMode)
+		#self.cleaning=False
 	#def clean
 	
 	def count(self):
