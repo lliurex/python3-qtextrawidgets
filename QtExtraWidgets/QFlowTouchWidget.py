@@ -20,18 +20,16 @@ class _layout(QLayout):
 		self.fastMode=fastMode
 	#def __init__
 
-	def __del__(self):
-		try:
-			item = self.takeAt(0)
-			while item:
-				item = self.takeAt(0)
-				self._itemList.remove(item)
-				self._widgetList.remove(item.widget())
-				del item
-		except Exception as e:
-			print(e)
-
-	#def __del__
+#	def __del__(self):
+#		item = self.takeAt(0)
+#		while item:
+#			item = self.takeAt(0)
+#			if item in self._itemList:
+#				self._itemList.remove(item)
+#			if item.widget() in self._widgetList:
+#				self._widgetList.remove(item.widget())
+#			del item
+#	#def __del__
 
 	def currentItem(self):
 		return(self._currentItem)
@@ -82,6 +80,7 @@ class _layout(QLayout):
 			elif item in self._widgetList: 
 				idx=self._widgetList.index(item)
 		except Exception as e:
+			print("--")
 			print(e)
 		return(idx)
 	#def indexOf
@@ -97,7 +96,7 @@ class _layout(QLayout):
 			wdg=self._widgetList.pop(index)
 			item=self._itemList.pop(index)
 			item.widget().setParent(None)
-			self.removeItem(item)
+			#self.removeItem(item)
 			return item
 		return None
 	#def takeAt
@@ -143,11 +142,10 @@ class _layout(QLayout):
 			item=itemList[-1]
 			#if item.widget()!=self.prevItem:
 			if item.widget()==None:
-				try:
+				if item in self._itemList:
 					self._itemList.remove(item)
+				if item.widget() in self._widgetList:
 					self._widgetList.remove(item.widget())
-				except:
-					pass
 			else:
 				style = item.widget().style()
 				layoutSpacingX = style.layoutSpacing(
