@@ -57,7 +57,7 @@ class _layout(QLayout):
 	#def addItem
 
 	def eventFilter(self,*args,**kwargs):
-		events=[QEvent.Type.Enter,QEvent.Type.FocusIn]
+		events=[QEvent.Type.Enter,QEvent.Type.FocusIn,QEvent.Type.HoverEnter]
 		if (args[1].type() in events) and args[0]!=None:
 			force=False
 			if args[1].type()==QEvent.Type.Enter:
@@ -76,10 +76,13 @@ class _layout(QLayout):
 
 	def indexOf(self,item):
 		idx=-1
-		if item in self._itemList:
-			idx=self._itemList.index(item)
-		elif item in self._widgetList: 
-			idx=self._widgetList.index(item)
+		try:
+			if item in self._itemList:
+				idx=self._itemList.index(item)
+			elif item in self._widgetList: 
+				idx=self._widgetList.index(item)
+		except Exception as e:
+			print(e)
 		return(idx)
 	#def indexOf
 
@@ -163,6 +166,8 @@ class _layout(QLayout):
 					y = item.sizeHint().height()+y
 					y+=spacing
 				item.setGeometry(QRect(QPoint(x, y), item.sizeHint()))
+				item.widget().setAttribute(Qt.WA_Hover, True)
+				item.widget().installEventFilter(self)
 		return (y-rect.y())
 	#def _doLayoutFast
 
@@ -196,6 +201,8 @@ class _layout(QLayout):
 
 			if not test_only:
 				item.setGeometry(QRect(QPoint(x, y), item.sizeHint()))
+				item.widget().installEventFilter(self)
+				item.widget().setAttribute(Qt.WA_Hover, True)
 
 			x = next_x
 			line_height = max(line_height, item.sizeHint().height())
@@ -212,6 +219,7 @@ class _layout(QLayout):
 #class _layout
 
 class QFlowTouchWidget(QScrollArea):
+	currentItemChanged=Signal("PyObject","PyObject")
 	def __init__(self, parent=None,fastMode=False):
 		super().__init__(parent)
 		self.setWidgetResizable(True)
@@ -220,10 +228,13 @@ class QFlowTouchWidget(QScrollArea):
 		self.content = QWidget(self)
 		self.setWidget(self.content)
 		self.flowLayout=_layout(self.content,fastMode)
+		self.flowLayout.currentItemChanged.connect(self._emitItemChanged)
 		self.fastMode=fastMode
 		self.cleaning=False
-
 	#def __init__
+
+	def _emitItemChanged(self,*args):
+		self.currentItemChanged.emit(*args)
 
 	def addItem(self, item):
 		if self.cleaning==True:
@@ -239,7 +250,7 @@ class QFlowTouchWidget(QScrollArea):
 		self.flowLayout.addWidget(item)
 		if self.fastMode==True:
 			QApplication.processEvents()
-			if len(self.flowLayout._itemList)%30==0:
+			if len(self.flowLayout._itemList)%40==0:
 				time.sleep(0.001)
 	#def addWidget
 
@@ -252,6 +263,7 @@ class QFlowTouchWidget(QScrollArea):
 		self.content._cache={}
 		wdg.deleteLater()
 		self.flowLayout=_layout(self.content,self.fastMode)
+		self.flowLayout.currentItemChanged.connect(self._emitItemChanged)
 		self.cleaning=False
 		#self.cleaning=True
 		#if self.flowLayout._previousItem!=None:	
