@@ -56,11 +56,12 @@ class _layout(QLayout):
 
 	def eventFilter(self,*args,**kwargs):
 		events=[QEvent.Type.Enter,QEvent.Type.FocusIn,QEvent.Type.HoverEnter]
-		if (args[1].type() in events) and args[0]!=None:
-			force=False
-			if args[1].type()==QEvent.Type.Enter:
-				force=True
-			self.setCurrentItem(args[0],force)
+		if isinstance(args[1],QEvent):
+			if (args[1].type() in events) and args[0]!=None:
+				force=False
+				if args[1].type()==QEvent.Type.Enter:
+					force=True
+				self.setCurrentItem(args[0],force)
 		return(False)
 	#def eventFilter
 
@@ -323,6 +324,10 @@ class QFlowTouchWidget(QScrollArea):
 
 	def setGeometry(self, rect):
 		self.setGeometry(rect)
+	#def setGeometry
+
+	def setSpacing(self, spacing):
+		self.flowLayout.setSpacing(spacing)
 	#def setGeometry
 
 	def sizeHint(self):
