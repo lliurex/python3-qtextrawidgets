@@ -137,6 +137,7 @@ class _layout(QLayout):
 		y = rect.y()
 		spacing = self.spacing()
 		itemList=self._itemList
+		height=0
 		if len(itemList)>0:
 			if len(self._itemList)%50==0:
 				time.sleep(0.05)
@@ -167,7 +168,8 @@ class _layout(QLayout):
 				item.setGeometry(QRect(QPoint(x, y), item.sizeHint()))
 				item.widget().setAttribute(Qt.WA_Hover, True)
 				item.widget().installEventFilter(self)
-		return (y-rect.y())
+				height = max(height, item.sizeHint().height())
+		return (y + height -rect.y())
 	#def _doLayoutFast
 
 	def _doLayout(self, rect, test_only):
