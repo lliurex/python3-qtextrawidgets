@@ -88,7 +88,7 @@ class _loadScreenShot(QThread):
 			try:
 				pxm=QtGui.QPixmap()
 				if ("://") in self.img:
-					img=requests.get(self.img,timeout=2)
+					img=requests.get(self.img,timeout=1)
 					pxm.loadFromData(img.content)
 					gotImg=True
 				else:
@@ -304,6 +304,7 @@ class QScreenShotContainer(QWidget):
 		for i in reversed(range(self.lay.count())): 
 			self.lay.itemAt(i).widget().deleteLater()
 		for th in self.th:
+			th.blockSignals(True)
 			th.quit()
 			th.wait()
 		self.btnImg={}
@@ -313,6 +314,7 @@ class QScreenShotContainer(QWidget):
 	def _cleanThreads(*args):
 		selfDict=args[0]
 		for th in selfDict.get("th",[]):
+			th.blockSignals(True)
 			th.quit()
 			th.wait()
 	#def _cleanThreads
