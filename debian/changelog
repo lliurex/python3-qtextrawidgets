@@ -1,3 +1,20 @@
+python3-qtextrawidgets (0.6.0-0llx25) noble; urgency=medium
+
+  * QFlowWidget
+  *   Fast mode
+  *   Fix layout total height
+  * QScreenShotContainer
+  *   Vertical layout
+  *   Fix segfault if pixmap not valid
+  * QKdeConfigWidget
+  *   Support for hex colors
+  * QStackedWindow
+  *   Fix segfault on load malformed stackedWindowItems 
+  * QSearchBox
+  *   Remove layout spacing
+  *   Check for valid QEvent before processing events
+ -- Juanma1980 <juanma1980@gmail.com>  Mon, 08 Sep 2025 11:56:34 +0200
+
 python3-qtextrawidgets (0.5.2.11-0llx25) noble; urgency=medium
 
   * Sync with jammy
