@@ -1,4 +1,6 @@
-from PySide6.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QHBoxLayout,QDialog,QAbstractItemView,QGridLayout,QTableWidgetItem
+#!/usr/bin/python3
+
+from PySide6.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QDialog,QTableWidgetItem,QHBoxLayout,QVBoxLayout,QGridLayout,QBoxLayout
 from PySide6 import QtGui
 from PySide6.QtCore import Qt,Signal,QEvent,QThread,QSize
 from QtExtraWidgets import QTableTouchWidget
@@ -11,7 +13,7 @@ class _loadScreenShot(QThread):
 		super().__init__()
 		self.img=args[0]
 		self.cacheDir=None
-		self.dbg=False
+		self.dbg=True
 		if len(args)>1:
 			self.setCacheDir(args[1])
 		self.destroyed.connect(partial(self._clean,self.__dict__))
@@ -63,7 +65,6 @@ class _loadScreenShot(QThread):
 			if (len(stripName)>MAX):
 				stripName=os.path.basename(stripName[len(stripName)-MAX:])
 			icn=QtGui.QIcon.fromTheme("image-x-generic")
-			pxm=icn.pixmap(512,512)
 			if stripName.endswith("png"):
 				stripName=stripName.replace("png",".png")
 			fPath=""
@@ -85,12 +86,13 @@ class _loadScreenShot(QThread):
 					print("Loading cache pixmap: {}".format(e))
 		if gotImg==False and self.img!="":
 			try:
+				pxm=QtGui.QPixmap()
 				if ("://") in self.img:
-					img=requests.get(self.img,timeout=2)
+					img=requests.get(self.img,timeout=1)
 					pxm.loadFromData(img.content)
 					gotImg=True
 				else:
-					icn=QtGui.QIcon.fromTheme("image-x-generic")
+					icn=QtGui.QIcon.fromTheme(os.path.basename(self.img))
 					pxm=icn.pixmap(512,512)
 					gotImg=True
 			except Exception as e:
@@ -113,13 +115,20 @@ class _loadScreenShot(QThread):
 #class _loadScreenShot
 
 class QScreenShotContainer(QWidget):
-	def __init__(self,parent=None):
+	def __init__(self,parent=None,direction="horizontal"):
 		QWidget.__init__(self, parent)
 		self.widget=QWidget()
-		self.lay=QHBoxLayout()
-		self.outLay=QHBoxLayout()
 		self.scroll=QScrollArea()
-		self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+		if direction=="horizontal":
+			self.lay=QHBoxLayout()
+			self.outLay=QHBoxLayout()
+			self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+			self.direction=QBoxLayout.LeftToRight
+		elif direction=="vertical":
+			self.lay=QVBoxLayout()
+			self.outLay=QVBoxLayout()
+			self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+			self.direction=QBoxLayout.TopToBottom
 		self.scroll.setWidgetResizable(True)
 		self.scroll.setWidget(self.widget)
 		self.outLay.addWidget(self.scroll)
@@ -155,7 +164,6 @@ class QScreenShotContainer(QWidget):
 		widget.verticalHeader().hide()
 		widget.horizontalHeader().hide()
 		widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-		widget.setRowCount(1)
 		return(widget)
 	#def _initWidget(self):
 
@@ -279,21 +287,26 @@ class QScreenShotContainer(QWidget):
 			if img.isNull()==False:
 				self.btnImg["btn"]=QPushButton()
 				self.btnImg[self.btnImg["btn"]]=img
-				self.lay.addWidget(self.btnImg["btn"])
 				icn=QtGui.QIcon(img)
 				self.btnImg["btn"].setIcon(icn)
 				self.btnImg["btn"].setIconSize(QSize(128,128))
-				self.scroll.setFixedHeight(self.btnImg["btn"].sizeHint().height()+32)
+				if self.direction==QBoxLayout.LeftToRight:
+					self.scroll.setFixedHeight(self.btnImg["btn"].sizeHint().height()+32)
+					self.lay.addWidget(self.btnImg["btn"])
+				elif self.direction==QBoxLayout.TopToBottom:
+					self.scroll.setFixedWidth(self.btnImg["btn"].sizeHint().width()+32)
+					self.lay.addWidget(self.btnImg["btn"],Qt.AlignTop)
 				self.btnImg["btn"].installEventFilter(self)
-				self.btnImg["btn"].show()
+				#self.btnImg["btn"].show()
 	#def load
 
 	def clear(self):
-		for th in self.th:
-			th.quit()
-			th.wait()
 		for i in reversed(range(self.lay.count())): 
 			self.lay.itemAt(i).widget().deleteLater()
+		for th in self.th:
+			th.blockSignals(True)
+			th.quit()
+			th.wait()
 		self.btnImg={}
 	#def clear
 
@@ -301,6 +314,7 @@ class QScreenShotContainer(QWidget):
 	def _cleanThreads(*args):
 		selfDict=args[0]
 		for th in selfDict.get("th",[]):
+			th.blockSignals(True)
 			th.quit()
 			th.wait()
 	#def _cleanThreads
