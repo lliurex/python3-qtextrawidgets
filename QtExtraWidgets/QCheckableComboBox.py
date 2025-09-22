@@ -54,7 +54,7 @@ class QCheckableComboBox(QComboBox):
 	#def setText
 
 	def hidePopup(self,*args,close=False):
-		self.setCurrentIndex(0)
+		#self.setCurrentIndex(0)
 		if close==False and self.checked==True:
 			self.checked=False
 			self.closed.emit()

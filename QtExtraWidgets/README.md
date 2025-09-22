@@ -1,9 +1,10 @@
-#python3-extrawidgets
+# python3-extrawidgets
 This package contains a set of custom pyside2 widgets.
 
-##QCheckableComboBox
+## QCheckableComboBox
 Combobox with checkboxes for items
 
+```
 class QCheckableComboBox(QComboBox)
 |  Functions:
 |    addItem(item,Qt.CheckState) -> bool
@@ -24,15 +25,17 @@ class QCheckableComboBox(QComboBox)
 |    closed
 |      Emited when popup menu closes
 |
-|  TODO:
-|    Add getState(index) -> int
-|    Add signal stateChanged
+```
+### TODO:
+* Add getState(index) -> int
+*  Add signal stateChanged
 
-##QHotkeyButton
+## QHotkeyButton
 QPushButton designed for hotkey assignment
 This buttons has an embedded event filter that carries all the logic for the operation.
 The assigned hotkey is holded by the text() method of pushbutton.
 
+```
 class QHotkeyButton(QPushButton)
 |  Functions:
 |    revertHotkey():
@@ -40,11 +43,13 @@ class QHotkeyButton(QPushButton)
 |  Signals:
 |    hotkeyAssigned({hotkey:str,action:str}):
 |		Emited when a hotkey is assigned
+```
 
-##QScreenShotContainer
+## QScreenShotContainer
 Widget for view images inside a horizontal scrollbar with embedded previewer.
 The widget itself loads the images through threads and has its own configurable cache folder for images.
 
+```
 |class QScreenShotContainer(QWidget)
 |  Functions:
 |    setCacheDir(dirpath) -> str
@@ -56,4 +61,4 @@ The widget itself loads the images through threads and has its own configurable 
 |    clear()
 |		Removes all content
 |
-|    
+```   
