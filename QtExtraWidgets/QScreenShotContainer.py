@@ -128,6 +128,8 @@ class QScreenShotContainer(QWidget):
 			self.lay=QVBoxLayout()
 			self.outLay=QVBoxLayout()
 			self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+			#Hide scrollbar
+			self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 			self.direction=QBoxLayout.TopToBottom
 		self.scroll.setWidgetResizable(True)
 		self.scroll.setWidget(self.widget)
