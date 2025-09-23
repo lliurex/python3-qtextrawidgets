@@ -1,6 +1,6 @@
-from PySide2.QtWidgets import QHBoxLayout,QComboBox,QLineEdit,QPushButton,QWidget,QSizePolicy
-from PySide2.QtGui import QIcon
-from PySide2.QtCore import Qt,Signal,QSize
+from PySide6.QtWidgets import QHBoxLayout,QComboBox,QLineEdit,QPushButton,QWidget,QSizePolicy
+from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt,Signal,QSize
 
 class QSearchBox(QWidget):
 	clicked=Signal()
