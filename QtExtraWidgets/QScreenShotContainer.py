@@ -88,7 +88,7 @@ class _loadScreenShot(QThread):
 			try:
 				pxm=QtGui.QPixmap()
 				if ("://") in self.img:
-					img=requests.get(self.img,timeout=1)
+					img=requests.get(self.img,timeout=5)
 					pxm.loadFromData(img.content)
 					gotImg=True
 				else:
