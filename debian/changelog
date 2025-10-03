@@ -1,6 +1,8 @@
-python3-qtextrawidgets (0.6.0.1-0llx23) jammy; urgency=medium
+python3-qtextrawidgets (0.6.0.2-0llx23) jammy; urgency=medium
 
   * Sync with noble
+  * QScreenShot:
+  *  Set timeout to 5
 
  -- Juanma1980 <juanma1980@gmail.com>  Mon, 22 Sep 2025 12:44:30 +0200
 
