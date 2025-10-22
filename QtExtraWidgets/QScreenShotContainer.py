@@ -16,7 +16,6 @@ class _loadScreenShot(QThread):
 		self.dbg=True
 		if len(args)>1:
 			self.setCacheDir(args[1])
-		self.destroyed.connect(partial(self._clean,self.__dict__))
 	#def __init__
 
 	def _debug(self,msg):
@@ -24,11 +23,6 @@ class _loadScreenShot(QThread):
 			print("{}".format(msg))
 	#def _debug
 
-	@staticmethod
-	def _clean(*args):
-		pass
-	#def _clean
-	
 	def setCacheDir(self,cacheDir):
 		sureDirs=["/tmp/.cache",os.path.join(os.environ.get('HOME',''),".cache")]
 		if isinstance(cacheDir,str)==False:
@@ -88,7 +82,7 @@ class _loadScreenShot(QThread):
 			try:
 				pxm=QtGui.QPixmap()
 				if ("://") in self.img:
-					img=requests.get(self.img,timeout=1)
+					img=requests.get(self.img,timeout=5)
 					pxm.loadFromData(img.content)
 					gotImg=True
 				else:
@@ -116,29 +110,41 @@ class _loadScreenShot(QThread):
 
 class QScreenShotContainer(QWidget):
 	def __init__(self,parent=None,direction="horizontal"):
-		QWidget.__init__(self, parent)
+		super().__init__()
+		self.destroyed.connect(partial(self._cleanThreads,self.__dict__))
 		self.widget=QWidget()
 		self.scroll=QScrollArea()
 		if direction=="horizontal":
 			self.lay=QHBoxLayout()
-			self.outLay=QHBoxLayout()
+			outLay=QHBoxLayout()
 			self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 			self.direction=QBoxLayout.LeftToRight
 		elif direction=="vertical":
 			self.lay=QVBoxLayout()
-			self.outLay=QVBoxLayout()
+			outLay=QVBoxLayout()
 			self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+			#Hide scrollbar
+			self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 			self.direction=QBoxLayout.TopToBottom
 		self.scroll.setWidgetResizable(True)
 		self.scroll.setWidget(self.widget)
-		self.outLay.addWidget(self.scroll)
-		self.setLayout(self.outLay)
+		outLay.addWidget(self.scroll)
+		self.setLayout(outLay)
 		self.widget.setLayout(self.lay)
 		self.cacheDir=None
 		self.th=[]
 		self.btnImg={}
-		self.destroyed.connect(partial(QScreenShotContainer._cleanThreads,self.__dict__))
 	#def __init__
+
+	@staticmethod
+	def _cleanThreads(*args):
+		selfDict=args[0]
+		for th in selfDict.get("th",[]):
+			th.blockSignals(True)
+			#th.quit()
+			th.deleteLater()
+			th.wait()
+	#def _cleanThreads
 
 	def setCacheDir(self,cacheDir):
 		if os.path.exists(cacheDir)==False:
@@ -269,16 +275,20 @@ class QScreenShotContainer(QWidget):
 	def addImage(self,img,cacheDir=""):
 		if len(cacheDir)==0:
 			cacheDir=self.cacheDir
-		scr=_loadScreenShot(img,cacheDir)
-		scr.imageReady.connect(self._load)
-		self.th.append(scr)
-		scr.start()
+		_scr=_loadScreenShot(img,cacheDir)
+		_scr.imageReady.connect(self._load)
+		self.th.append(_scr)
+		print(self.th)
+
+		_scr.start()
 	#def addImage
 
 	def loadScreenShot(self,img,cacheDir=""):
 		if len(cacheDir)==0:
 			cacheDir=self.cacheDir
-		return(_loadScreenShot(img,cacheDir))
+		_scr=_loadScreenShot(img,cacheDir)
+		self.th.append(_scr)
+		return(_scr)
 	#def loadScreenShot(self,img,cacheDir="")
 
 	def _load(self,*args):
@@ -309,13 +319,4 @@ class QScreenShotContainer(QWidget):
 			th.wait()
 		self.btnImg={}
 	#def clear
-
-	@staticmethod
-	def _cleanThreads(*args):
-		selfDict=args[0]
-		for th in selfDict.get("th",[]):
-			th.blockSignals(True)
-			th.quit()
-			th.wait()
-	#def _cleanThreads
 #class QScreenShotContainer

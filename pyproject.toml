@@ -18,6 +18,6 @@ classifiers=[
   ]
 dependencies=[
   "requests",
-  "PySide2",
+  "PySide6",
   ]
 
