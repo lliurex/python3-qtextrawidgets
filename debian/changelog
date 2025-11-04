@@ -1,4 +1,4 @@
-python3-qtextrawidgets (0.6.0.3-0llx23) jammy; urgency=medium
+python3-qtextrawidgets (0.6.0.3-2llx23) jammy; urgency=medium
 
   * Fix QScreenShot clean on exit
 
