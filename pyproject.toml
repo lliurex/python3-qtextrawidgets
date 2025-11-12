@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name='QtExtrawidgets'
-version="0.5.2"
+version="0.6.0"
 description='Some widgets for pySide'
 authors=[
   {name='Lliurex Team'},
@@ -18,6 +18,6 @@ classifiers=[
   ]
 dependencies=[
   "requests",
-  "PySide6",
+  "PySide2",
   ]
 
