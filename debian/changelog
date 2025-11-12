@@ -1,3 +1,16 @@
+python3-qtextrawidgets (0.6.1-0llx25) noble; urgency=medium
+
+  * QStackedWindow:
+      - Fix scan of non existing path
+
+ -- Juanma1980 <juanma1980@gmail.com>  Tue, 11 Nov 2025 10:32:46 +0100
+
+python3-qtextrawidgets (0.6.0.3-0llx25) noble; urgency=medium
+
+  * Sync with Jammy
+
+ -- Juanma1980 <juanma1980@gmail.com>  Tue, 11 Nov 2025 10:32:23 +0100
+
 python3-qtextrawidgets (0.6.0.2-0llx25) noble; urgency=medium
 
   * Sync with Jammy.
