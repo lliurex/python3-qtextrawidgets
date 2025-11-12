@@ -1,3 +1,10 @@
+python3-qtextrawidgets (0.6.2-0llx25) jammy; urgency=medium
+
+  * QPushButtonInfo:
+    - Fix loading image from file
+
+ -- Juanma1980 <juanma1980@gmail.com>  Wed, 12 Nov 2025 07:54:29 +0100
+
 python3-qtextrawidgets (0.6.1-0llx25) noble; urgency=medium
 
   * QStackedWindow:
