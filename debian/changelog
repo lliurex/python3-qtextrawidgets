@@ -1,4 +1,4 @@
-python3-qtextrawidgets (0.6.2-0llx25) jammy; urgency=medium
+python3-qtextrawidgets (0.6.2-0llx25) noble; urgency=medium
 
   * QPushButtonInfo:
     - Fix loading image from file
