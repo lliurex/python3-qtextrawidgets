@@ -257,14 +257,17 @@ class QFlowTouchWidget(QScrollArea):
 
 	def clean(self):
 		self.cleaning=True
-		wdg=QWidget()
-		wdg.setLayout(self.content.layout())
-		self.content._itemList = []
-		self.content._widgetList = []
-		self.content._cache={}
-		wdg.deleteLater()
+		objName=self.objectName()
+		wdg=self.takeWidget()
+		#wdg.setLayout(self.content.layout())
+		self.content = QWidget(self)
+		self.content.setObjectName(objName)
+		self.flowLayout._itemList.clear()
+		self.flowLayout._widgetList.clear()
+		#wdg.deleteLater()
 		self.flowLayout=_layout(self.content,self.fastMode)
 		self.flowLayout.currentItemChanged.connect(self._emitItemChanged)
+		self.setWidget(self.content)
 		self.cleaning=False
 		#self.cleaning=True
 		#if self.flowLayout._previousItem!=None:	
