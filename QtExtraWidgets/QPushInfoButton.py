@@ -3,7 +3,7 @@ import sys
 import os
 from PySide6.QtWidgets import QLabel, QPushButton,QGridLayout,QHBoxLayout,QSizePolicy
 from PySide6 import QtGui
-from PySide6.QtCore import Qt,Signal
+from PySide6.QtCore import Qt,Signal,QSize
 from QtExtraWidgets import QTableTouchWidget,QStackedWindowItem,QInfoLabel
 import requests
 
@@ -22,7 +22,9 @@ class QPushInfoButton(QPushButton):
 		self.icon=QLabel()
 		self.setCursor(QtGui.QCursor(Qt.PointingHandCursor))
 		lay=QGridLayout()
-		lay.addWidget(self.icon,0,0,2,1)
+		lay.setColumnStretch(0,0)
+		lay.setColumnStretch(1,1)
+		lay.addWidget(self.icon,0,0,2,1,Qt.AlignLeft)
 		lay.addWidget(self.label,0,1,1,1)
 		lay.addWidget(self.description,1,1,1,1)
 		self.setDefault(True)
@@ -48,12 +50,14 @@ class QPushInfoButton(QPushButton):
 		if icn:
 			wsize=128
 			self.icon.setPixmap(icn.scaled(wsize,128,Qt.KeepAspectRatio,Qt.SmoothTransformation))
+		self.icon.setFixedSize(QSize(128,128))
 		self.adjustSize()
 	#def loadImg
 
 	def setIcon(self,icon):
 		if isinstance(icon,QtGui.QIcon):
 			self.icon.setPixmap(icon.pixmap(128,128))
+			self.icon.setFixedSize(QSize(128,128))
 			self.adjustSize()
 	#def setIcon
 
