@@ -1,3 +1,10 @@
+python3-qtextrawidgets (0.6.4-0llx25) noble; urgency=medium
+
+  * QPushInfoButton:
+  *  Improve layout
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 06 Feb 2026 14:00:33 +0100
+
 python3-qtextrawidgets (0.6.3-0llx25) noble; urgency=medium
 
   * QFlowWidget
