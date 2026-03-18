@@ -3,7 +3,7 @@ import sys
 import os
 from PySide2.QtWidgets import QLabel, QPushButton,QGridLayout,QHBoxLayout,QSizePolicy
 from PySide2 import QtGui
-from PySide2.QtCore import Qt,Signal
+from PySide2.QtCore import Qt,Signal,QSize
 from QtExtraWidgets import QTableTouchWidget,QStackedWindowItem,QInfoLabel
 import requests
 
