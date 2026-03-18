@@ -1,3 +1,9 @@
+python3-qtextrawidgets (0.6.4-0llx23) jammy; urgency=medium
+
+  * Merge with noble
+
+ -- Juanma1980 <juanma1980@gmail.com>  Wed, 18 Mar 2026 10:28:46 +0100
+
 python3-qtextrawidgets (0.6.0.3-2llx23) jammy; urgency=medium
 
   * Fix QScreenShot clean on exit
