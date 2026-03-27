@@ -67,7 +67,10 @@ class QPushInfoButton(QPushButton):
 	def setText(self,text):
 		self.label.setText(text)
 		self.setAccessibleName(text)
-		self.label.setStyleSheet("font-weight: bold;")
+		font=self.label.font()
+		font.setBold(True)
+		self.label.setFont(font)
+		#self.label.setStyleSheet("font-weight: bold;")
 		self.adjustSize()
 	#def setText(self,text)
 
