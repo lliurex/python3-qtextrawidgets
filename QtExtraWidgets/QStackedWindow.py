@@ -58,6 +58,8 @@ class QStackedWindow(QWidget):
 		super(QStackedWindow,self).__init__(self.wparent)
 		self.setParent(self.wparent)
 		self.dbg=True
+		self.autoNavigate=False
+		self.lstNavKeyNav=None
 		self.current=-1
 		self.referer=-1
 		self.setAttribute(Qt.WA_DeleteOnClose, True)
@@ -94,8 +96,11 @@ class QStackedWindow(QWidget):
 		lay.setContentsMargins(1,1,2,1)
 		lay.addWidget(self.lblBanner,0,0,1,2,Qt.AlignCenter)
 		lay.addWidget(self.lstNav,1,0,1,1)
-		self.lstNav.activated.connect(self.setCurrentStack)
-		self.lstNav.itemClicked.connect(self.setCurrentStack)
+		if self.autoNavigate==False:
+			self.lstNav.activated.connect(self.setCurrentStack)
+			self.lstNav.itemClicked.connect(self.setCurrentStack)
+		else:
+			self.lstNav.currentItemChanged.connect(self.setCurrentStack)
 		lay.addWidget(self.stkPan,1,1,1,1)
 		lay.setColumnStretch(1,1)
 		lay.addWidget(self.lstPortrait,1,1,1,1)
@@ -166,6 +171,37 @@ class QStackedWindow(QWidget):
 						return
 		self._endSetCurrentStack(idx,parms)
 	#def setCurrentStack
+
+	def _fakeNavEvent(self,*args):
+		ev=args[0]
+		if ev.key()==Qt.Key_Right:
+			c=self.stkPan.currentWidget()
+			for chl in c.children():
+				c.setFocus()
+		else:
+			self.lstNavKeyNav(*args)
+
+	def toggleAutoNavigation(self):
+		self.autoNavigate=not(self.autoNavigate)
+		if self.autoNavigate==False:
+			self.lstNav.activated.connect(self.setCurrentStack)
+			self.lstNav.itemClicked.connect(self.setCurrentStack)
+			if self.lstNavKeyNav!=None:
+				self.lstNav.keyPressEvent=self.lstNavKeyNav
+			try:
+				self.lstNav.currentItemChanged.disconnect()
+			except:
+				pass
+		else:
+			self.lstNav.currentItemChanged.connect(self.setCurrentStack)
+			self.lstNavKeyNav=self.lstNav.keyPressEvent
+			self.lstNav.keyPressEvent=self._fakeNavEvent
+			try:
+				self.lstNav.activated.disconnect()
+				self.lstNav.itemClicked.disconnect()
+			except:
+				pass
+	#def toggleAutoNavigation
 
 	def setIcon(self,ficon):
 		#Wayland only:

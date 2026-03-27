@@ -40,7 +40,6 @@ class QHotkeyButton(QPushButton):
 		self.originalText=text
 		self.setAttribute(Qt.WA_KeyCompression,False)
 		self.sw_mod=False
-		self.keypressed=0
 		self.seq=[]
 	#def __init__
 
@@ -52,6 +51,7 @@ class QHotkeyButton(QPushButton):
 		self.originalText=self.text()
 		self.setText(self.alternate)
 		self.processed=False
+		self.seq=[]
 		self._grab_alt_keys()
 	#def mousePressEvent
 
@@ -59,30 +59,25 @@ class QHotkeyButton(QPushButton):
 		if (event.type()==QEvent.KeyPress):
 			if event.key() not in self.seq:
 				self.seq.append(event.key())
-			self.keypressed=len(self.seq)
 		if (event.type()==QEvent.KeyRelease):
-			self.keypressed-=1
-			if self.keypressed>0:
-				return(False)
+			self.releaseKeyboard()
 			if len(self.seq)>2:
 				seq=QKeySequence(self.seq[0],self.seq[1],self.seq[2])
 			elif len(self.seq)>1:
 				seq=QKeySequence(self.seq[0],self.seq[1])
 			else:
-				seq=QKeySequence(self.seq[0])
+				self.seq=[]
+				return(False)
 			if seq.toString() in self.keymap.values():
 				self.seq=[]
-				self.releaseKeyboard()
 				return(False)
 			self.keybind_signal.emit(seq.toString().replace(", ","+"))
-			self.releaseKeyboard()
-			self.seq=[]
 			if self.processed==False:
 				action=self.getSettingForHotkey()
 				retVal={"hotkey":self.text(),"action":action}
 				self.hotkeyAssigned.emit(retVal)
 			self.processed=True
-
+			self.seq=[]
 		return False
 	#def eventFilter
 
@@ -96,7 +91,7 @@ class QHotkeyButton(QPushButton):
 		self.setText(keypress)
 	#def _set_config_key
 
-	def getSettingForHotkey(self):
+	def _readKGlobal(self):
 		hotkey=self.text()
 		kfile="kglobalshortcutsrc"
 		action=""
@@ -113,6 +108,29 @@ class QHotkeyButton(QPushButton):
 					if hotkey.lower()==line.replace("_launch=","").split(",")[0].lower():
 						action=line.split(",")[-1]
 						break
+		return(action)
+	#def _readKGlobal
+		
+	def _readKHotkeys(self):
+		hotkey=self.text()
+		kfile="khotkeysrc"
+		action=""
+		sourceFolder=os.path.join(os.environ.get('HOME',"/usr/share/acccessibility"),".config")
+		kPath=os.path.join(sourceFolder,kfile)
+		with open(kPath,"r") as f:
+			lines=f.readlines()
+		for line in lines:
+			if len(line.split("="))>1:
+				if hotkey.lower()==line.split("=")[-1].lower().strip().removeprefix("\n"):
+					action=line.split("=")[-1].strip()
+					break
+		return(action)
+	#def _readKHotkeys
+
+	def getSettingForHotkey(self):
+		action=self._readKGlobal().strip()
+		if action=="":
+			action=self._readKHotkeys()
 		return(action.replace("\n",""))
 	#def getSettingForHotkey
 
