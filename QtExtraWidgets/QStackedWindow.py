@@ -7,9 +7,9 @@ import inspect
 import time
 from queue import Queue
 import traceback
-from PySide2.QtWidgets import QApplication,QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
-from PySide2 import QtGui
-from PySide2.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject,QSize
+from PySide6.QtWidgets import QApplication,QLabel, QWidget, QGridLayout,QListWidget,QListWidgetItem,QStackedWidget,QHeaderView
+from PySide6 import QtGui
+from PySide6.QtCore import Qt,Signal,QRunnable,Slot,QThreadPool,QObject,QSize
 from QtExtraWidgets import QPushInfoButton as qinfo,QTableTouchWidget as qtouch
 import notify2
 QString=type("")

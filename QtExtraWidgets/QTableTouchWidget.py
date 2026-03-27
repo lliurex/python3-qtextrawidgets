@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import QScroller,QScrollerProperties,QTableWidget,QWidget,QAbstractItemView
-import PySide2
+from PySide6.QtWidgets import QScroller,QScrollerProperties,QTableWidget,QWidget,QAbstractItemView
+import PySide6
 
 class QTableTouchWidget(QTableWidget):
 	def __init__(self,*args,**kwargs):

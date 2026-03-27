@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
-from PySide2.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QDialog,QTableWidgetItem,QHBoxLayout,QVBoxLayout,QGridLayout,QBoxLayout
-from PySide2 import QtGui
-from PySide2.QtCore import Qt,Signal,QEvent,QThread,QSize
+from PySide6.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QDialog,QTableWidgetItem,QHBoxLayout,QVBoxLayout,QGridLayout,QBoxLayout
+from PySide6 import QtGui
+from PySide6.QtCore import Qt,Signal,QEvent,QThread,QSize
 from QtExtraWidgets import QTableTouchWidget
 import os,requests
 from functools import partial
@@ -192,9 +192,9 @@ class QScreenShotContainer(QWidget):
 		dlg=QDialog()	
 		dlg.setModal(True)
 		#if (w==0) or (h==0):
-		#	#sizeObject = QDesktopWidget().screenGeometry(-1) #PySide2
+		#	#sizeObject = QDesktopWidget().screenGeometry(-1) #PySide6
 		#	qscr=QtGui.QScreen()
-		#	sizeObject = qscr.size() #PySide2
+		#	sizeObject = qscr.size() #PySide6
 		#	print(sizeObject)
 		#	w=int(sizeObject.width()/2)
 		#	h=int(sizeObject.height()/2)
