@@ -1,3 +1,10 @@
+python3-qtextrawidgets (0.6.5) noble; urgency=medium
+
+  * QStackedWindow
+  *  Add method for toggle autonavigation
+
+ -- Juanma1980 <juanma1980@gmail.com>  Mon, 27 Apr 2026 08:29:19 +0200
+
 python3-qtextrawidgets (0.6.4-0llx25) noble; urgency=medium
 
   * QPushInfoButton:
