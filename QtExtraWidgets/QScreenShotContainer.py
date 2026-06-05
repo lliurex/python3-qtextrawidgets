@@ -278,7 +278,6 @@ class QScreenShotContainer(QWidget):
 		_scr=_loadScreenShot(img,cacheDir)
 		_scr.imageReady.connect(self._load)
 		self.th.append(_scr)
-		print(self.th)
 
 		_scr.start()
 	#def addImage
