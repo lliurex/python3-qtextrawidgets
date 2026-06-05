@@ -10,7 +10,7 @@ import requests
 ICON_SIZE=128
 
 class QPushInfoButton(QPushButton):
-	clicked=Signal("PyObject")
+	#clicked=Signal("PyObject")
 	def __init__(self,parent=None):
 		super().__init__()
 		self.cacheDir=os.path.join(os.environ.get('HOME'),".cache","rebost","imgs")
@@ -91,16 +91,17 @@ class QPushInfoButton(QPushButton):
 		self.setToolTip("{0}".format(text))
 	
 	def activate(self):
-		self.clicked.emit(self)
+		self.clicked.emit()
 	#def activate
 
 	def keyPressEvent(self,ev):
 		if ev.key() in [Qt.Key_Return,Qt.Key_Enter,Qt.Key_Space]:
-			self.clicked.emit(self)
+			self.clicked.emit()
 		ev.ignore()
 	#def keyPressEvent(self,ev):
 
-	def mousePressEvent(self,*args):
-		self.clicked.emit(self)
-	#def mousePressEvent
+#	def mousePressEvent(self,*args):
+#		self.clicked.emit(self)
+#	#def mousePressEvent
+
 #class QPushButtonRebostApp
