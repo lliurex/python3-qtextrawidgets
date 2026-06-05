@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QGridLayout,QLabel,QWidget,QPushButton,QCheckBox
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import Qt,Signal
+from PySide2.QtWidgets import QGridLayout,QLabel,QWidget,QPushButton,QCheckBox
+from PySide2.QtGui import QIcon
+from PySide2.QtCore import Qt,Signal
 
 class QItemDescCheck(QWidget):
 	stateChanged=Signal("bool")
