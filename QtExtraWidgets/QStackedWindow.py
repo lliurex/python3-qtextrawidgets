@@ -327,6 +327,8 @@ class QStackedWindow(QWidget):
 		item.setData(Qt.AccessibleDescriptionRole,props.get("longDesc"))
 		#item.setIcon(icon)
 		self.lstNav.insertItem(idx,item)
+		f=self.lstNav.font()
+		self.lstNav.setMaximumWidth(f.pointSize()*len(props.get("shortDesc"))+32)
 		if props.get("visible",True)==False:
 			item.setHidden(True)
 		callback()
