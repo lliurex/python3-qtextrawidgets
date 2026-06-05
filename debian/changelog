@@ -1,3 +1,10 @@
+python3-qtextrawidgets (0.6.7) jammy; urgency=medium
+
+  * QStackedWindow:
+  *  Navigation list width relative to items
+
+ -- Juanma1980 <juanma1980@gmail.com>  Fri, 05 Jun 2026 12:11:02 +0200
+
 python3-qtextrawidgets (0.6.6) jammy; urgency=medium
 
   * Merge with noble
