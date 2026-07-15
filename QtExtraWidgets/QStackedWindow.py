@@ -377,7 +377,11 @@ class QStackedWindow(QWidget):
 		self.queue=Queue()
 		self.threadpool = QThreadPool()
 		for plugin in os.scandir(dpath):
-			self._debug("Inspecting file {}".format(plugin.path))
+			if plugin.name.endswith(".py"):
+				self._debug("Inspecting file {}".format(plugin.path))
+			else:
+				self._debug("discard file {}".format(plugin.path))
+				continue
 			loader=moduleLoader(plugin.path,self.queue)
 			self.threadpool.start(loader)
 		self.threadpool.waitForDone()
