@@ -1,3 +1,10 @@
+python3-qtextrawidgets (0.6.8) jammy; urgency=medium
+
+  * QStackedWindow:
+  *  Only try to load files of interest
+
+ -- Juanma1980 <juanma1980@gmail.com>  Wed, 15 Jul 2026 12:48:45 +0200
+
 python3-qtextrawidgets (0.6.7) jammy; urgency=medium
 
   * QStackedWindow:
