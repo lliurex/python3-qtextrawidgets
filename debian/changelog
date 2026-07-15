@@ -1,9 +1,16 @@
+python3-qtextrawidgets (0.6.8) noble; urgency=medium
+
+  * QStackedWindow:
+  *  Only try to load files of interest
+
+ -- Juanma1980 <juanma1980@gmail.com>  Wed, 15 Jul 2026 09:00:37 +0200
+
 python3-qtextrawidgets (0.6.7) noble; urgency=medium
 
   * QStackedWindow:
   *  Navigation panel maximum width relative to options
   * QPushInfoButton:
-  *  Improved layout
+  *  Image size relative to button size
 
  -- Juanma1980 <juanma1980@gmail.com>  Fri, 05 Jun 2026 12:18:11 +0200
 
