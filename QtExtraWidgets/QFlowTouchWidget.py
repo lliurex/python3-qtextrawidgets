@@ -179,6 +179,9 @@ class _layout(QLayout):
 		spacing = self.spacing()
 		itemList=self._itemList
 		for item in itemList:
+			if hasattr(item,"widget")==False:
+				self._itemList.remove(item)
+				continue
 			if item.widget()==None:
 				self._itemList.remove(item)
 				continue
@@ -191,6 +194,7 @@ class _layout(QLayout):
 				QSizePolicy.ControlType.PushButton, QSizePolicy.ControlType.PushButton,
 				Qt.Orientation.Vertical
 			)
+			space_x = spacing + layout_spacing_x
 			space_x = spacing + layout_spacing_x
 			space_y = spacing + layout_spacing_y
 			next_x = x + item.sizeHint().width() + space_x
@@ -231,8 +235,16 @@ class QFlowTouchWidget(QScrollArea):
 		self.flowLayout=_layout(self.content,fastMode)
 		self.flowLayout.currentItemChanged.connect(self._emitItemChanged)
 		self.fastMode=fastMode
+		self.spacing=self.flowLayout.spacing()
 		self.cleaning=False
 	#def __init__
+
+	def showVerticalScrollBar(self,visible=False):
+		if visible==True:
+			self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+		else:
+			self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+	#def showVerticalScrollBar
 
 	def _emitItemChanged(self,*args):
 		self.currentItemChanged.emit(*args)
@@ -268,6 +280,7 @@ class QFlowTouchWidget(QScrollArea):
 		self.flowLayout=_layout(self.content,self.fastMode)
 		self.flowLayout.currentItemChanged.connect(self._emitItemChanged)
 		self.setWidget(self.content)
+		self.flowLayout.setSpacing(self.spacing)
 		self.cleaning=False
 		#self.cleaning=True
 		#if self.flowLayout._previousItem!=None:	
@@ -333,6 +346,7 @@ class QFlowTouchWidget(QScrollArea):
 
 	def setSpacing(self, spacing):
 		self.flowLayout.setSpacing(spacing)
+		self.spacing=spacing
 	#def setGeometry
 
 	def sizeHint(self):
