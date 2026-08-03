@@ -46,8 +46,9 @@ class QPushInfoButton(QPushButton):
 			lay.addWidget(self.lblDesc,0,0,2,2)
 		elif self.scroll==True:
 			lay.addWidget(self.label,0,0,1,2,Qt.AlignRight|Qt.AlignTop)
-			lay.addWidget(self.icon,0,1,1,1,Qt.AlignCenter|Qt.AlignTop)
-			lay.addWidget(self.lblDesc,1,0,1,2)
+			lay.addWidget(self.icon,0,1,2,2,Qt.AlignRight|Qt.AlignTop)
+			lay.addWidget(QLabel("<hr>"),1,1,1,3,Qt.AlignRight|Qt.AlignTop)
+			lay.addWidget(self.lblDesc,2,0,1,3)
 			lay.setRowStretch(0,0)
 			lay.setRowStretch(1,1)
 		else:
