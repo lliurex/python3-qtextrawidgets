@@ -13,12 +13,14 @@ class QStyledLabel(QLabel):
 		self.setAutoFillBackground(True)
 		self.colorFrom=QColor(224, 214, 255,50)
 		self.colorTo=QColor(128, 100, 228,220)
+		self.x1=1.2
+		self.x2=1.1
 	#def __init__(self, text="", parent=None):
 
 	def paintEvent(self, event):
 		painter = QPainter(self)
 		painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-		gradient = QLinearGradient(self.width()/1.2, 0, self.width()/1.1, self.height())
+		gradient = QLinearGradient(self.width()/self.x1, 0, self.width()/self.x2, self.height())
 		gradient.setColorAt(0, self.colorFrom)  # Blue
 		gradient.setColorAt(1, self.colorTo)  # Purple
 		painter.fillRect(self.rect(), gradient)
