@@ -138,6 +138,8 @@ class QScreenShotContainer(QWidget):
 		self.th=[]
 		self.btnImg={}
 		self.wdgImg={}
+		self.w=128
+		self.h=128
 	#def __init__
 
 	@staticmethod
@@ -195,7 +197,7 @@ class QScreenShotContainer(QWidget):
 		self.widget.setRowHeight(self.widget.rowCount()-1,ySize)
 	#def _addImgToWidget
 
-	def _carrousel(self,btn="",w=0,h=0):
+	def _carrousel(self,btn="",xSize=512,ySize=512):
 		dlg=QDialog()	
 		dlg.setModal(True)
 		#if (w==0) or (h==0):
@@ -206,9 +208,7 @@ class QScreenShotContainer(QWidget):
 		#	w=int(sizeObject.width()/2)
 		#	h=int(sizeObject.height()/2)
 		#Workaround for size. Set size between 512<>980
-		xSize=512
-		maxWidth=980
-		ySize=512
+		maxWidth=(xSize*2)-48
 		sizes=[]
 		self.widget=self._initWidget()
 		mainLay=QGridLayout()
@@ -320,9 +320,11 @@ class QScreenShotContainer(QWidget):
 				self.btnImg[self.btnImg["btn"]]=img
 				icn=QtGui.QIcon(img)
 				self.btnImg["btn"].setIcon(icn)
-				self.btnImg["btn"].setIconSize(QSize(128,128))
+				self.btnImg["btn"].setIconSize(QSize(self.w,self.h))
+				spacer=min(32,int(self.w/4))
 				if self.direction==QBoxLayout.LeftToRight:
-					self.scroll.setFixedHeight(max(self.btnImg["btn"].sizeHint().height(),img.height())+32)
+					self.scroll.setFixedHeight(self.btnImg["btn"].sizeHint().height()+spacer)#,img.height())+32)
+					self.setFixedHeight(self.btnImg["btn"].sizeHint().height()+spacer)#,img.height())+32)
 					self.lay.addWidget(self.btnImg["btn"])
 				elif self.direction==QBoxLayout.TopToBottom:
 					self.scroll.setFixedWidth(self.btnImg["btn"].sizeHint().width()+32)
