@@ -15,7 +15,7 @@ class _loadImage(QThread):
 		super().__init__()
 		self.img=kwargs.get("img",None)
 		self.cacheDir=None
-		self.dbg=True
+		self.dbg=False
 		if len(args)>1:
 			self.setCacheDir(args[1])
 	#def __init__
