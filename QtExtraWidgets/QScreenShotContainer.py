@@ -3,12 +3,12 @@
 from PySide6.QtWidgets import QWidget, QPushButton,QScrollArea,QLabel,QDialog,QTableWidgetItem,QHBoxLayout,QVBoxLayout,QGridLayout,QBoxLayout
 from PySide6 import QtGui
 from PySide6.QtCore import Qt,Signal,QEvent,QThread,QSize
-from QtExtraWidgets import QTableTouchWidget
+from QtExtraWidgets import QTableTouchWidget,QPushInfoButton
 import os,requests
 from functools import partial
 
 class _loadScreenShot(QThread):
-	imageReady=Signal("PyObject")
+	imageReady=Signal("PyObject","PyObject")
 	def __init__(self,*args):
 		super().__init__()
 		self.img=args[0]
@@ -103,16 +103,19 @@ class _loadScreenShot(QThread):
 			#Load generic pixmap
 			icn=QtGui.QIcon.fromTheme("image-x-generic")
 			pxm=icn.pixmap(256,256)
-		self.imageReady.emit(pxm)
+		self.imageReady.emit(pxm,self.img)
 		return True
 	#def run
 #class _loadScreenShot
 
 class QScreenShotContainer(QWidget):
+	btnLoaded=Signal("PyObject")
+	
 	def __init__(self,parent=None,direction="horizontal"):
 		super().__init__()
 		self.destroyed.connect(partial(self._cleanThreads,self.__dict__))
 		self.widget=QWidget()
+		self.callback=None
 		self.scroll=QScrollArea()
 		if direction=="horizontal":
 			self.lay=QHBoxLayout()
@@ -134,6 +137,9 @@ class QScreenShotContainer(QWidget):
 		self.cacheDir=None
 		self.th=[]
 		self.btnImg={}
+		self.wdgImg={}
+		self.w=128
+		self.h=128
 	#def __init__
 
 	@staticmethod
@@ -159,7 +165,10 @@ class QScreenShotContainer(QWidget):
 	def eventFilter(self,source,qevent):
 		if isinstance(qevent,QEvent):
 			if qevent.type()==QEvent.Type.MouseButtonPress:
-				self._carrousel(source)
+				if self.callback==None:
+					self._carrousel(source)
+				else:
+					self.callback(source)
 		return(False)
 	#def eventFilter
 
@@ -188,7 +197,7 @@ class QScreenShotContainer(QWidget):
 		self.widget.setRowHeight(self.widget.rowCount()-1,ySize)
 	#def _addImgToWidget
 
-	def _carrousel(self,btn="",w=0,h=0):
+	def _carrousel(self,btn="",xSize=512,ySize=512):
 		dlg=QDialog()	
 		dlg.setModal(True)
 		#if (w==0) or (h==0):
@@ -199,9 +208,7 @@ class QScreenShotContainer(QWidget):
 		#	w=int(sizeObject.width()/2)
 		#	h=int(sizeObject.height()/2)
 		#Workaround for size. Set size between 512<>980
-		xSize=512
-		maxWidth=980
-		ySize=512
+		maxWidth=(xSize*2)-48
 		sizes=[]
 		self.widget=self._initWidget()
 		mainLay=QGridLayout()
@@ -278,9 +285,18 @@ class QScreenShotContainer(QWidget):
 		_scr=_loadScreenShot(img,cacheDir)
 		_scr.imageReady.connect(self._load)
 		self.th.append(_scr)
-
 		_scr.start()
 	#def addImage
+
+	def addImageWidget(self,wdg,img,cacheDir=""):
+		if img not in self.wdgImg:
+			self.wdgImg[img]=[wdg]
+		else:
+			self.wdgImg[img].append(wdg)
+		if wdg not in self.btnImg:
+			self.btnImg[wdg]=img
+		self.addImage(img,cacheDir)
+	#def addImageWidget
 
 	def loadScreenShot(self,img,cacheDir=""):
 		if len(cacheDir)==0:
@@ -294,18 +310,27 @@ class QScreenShotContainer(QWidget):
 		img=args[0]
 		if isinstance(img,QtGui.QPixmap):
 			if img.isNull()==False:
-				self.btnImg["btn"]=QPushButton()
+				cwdg=None
+				if len(args)>1:
+					cwdg=self.wdgImg.get(args[1],[None]).pop()
+				if cwdg==None:
+					cwdg=QPushButton()
+				
+				self.btnImg["btn"]=cwdg
 				self.btnImg[self.btnImg["btn"]]=img
 				icn=QtGui.QIcon(img)
 				self.btnImg["btn"].setIcon(icn)
-				self.btnImg["btn"].setIconSize(QSize(128,128))
+				self.btnImg["btn"].setIconSize(QSize(self.w,self.h))
+				spacer=min(32,int(self.w/4))
 				if self.direction==QBoxLayout.LeftToRight:
-					self.scroll.setFixedHeight(self.btnImg["btn"].sizeHint().height()+32)
+					self.scroll.setFixedHeight(self.btnImg["btn"].sizeHint().height()+spacer)#,img.height())+32)
+					self.setFixedHeight(self.btnImg["btn"].sizeHint().height()+spacer)#,img.height())+32)
 					self.lay.addWidget(self.btnImg["btn"])
 				elif self.direction==QBoxLayout.TopToBottom:
 					self.scroll.setFixedWidth(self.btnImg["btn"].sizeHint().width()+32)
 					self.lay.addWidget(self.btnImg["btn"],Qt.AlignTop)
 				self.btnImg["btn"].installEventFilter(self)
+			#self.btnLoaded.emit(self.btnImg["btn"])
 				#self.btnImg["btn"].show()
 	#def load
 
