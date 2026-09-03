@@ -88,7 +88,7 @@ class _loadImage(QThread):
 			try:
 				pxm=QtGui.QPixmap()
 				if ("://") in self.img:
-					img=requests.get(self.img,timeout=5)
+					img=requests.get(self.img,timeout=1)
 					pxm.loadFromData(img.content)
 					gotImg=True
 				else:
@@ -194,7 +194,17 @@ class QPushInfoButton(QPushButton):
 		#self.label.setMinimumWidth(self.width()/1.1)
 		self.thImg.setImg(img)
 		self.thImg.start()
+		icn2=QtGui.QIcon.fromTheme("xterm")
+		icn=icn2.pixmap(self.defaultSize,self.defaultSize)
+		w=icn.width()
+		h=icn.height()
+		self.icon.setPixmap(icn.scaled(w,h,Qt.KeepAspectRatio,Qt.SmoothTransformation))
+		if self.overlay==False:
+			h=min(self.icon.size().height()+self.label.sizeHint().height(),self.lblDesc.sizeHint().height()+self.label.sizeHint().height()+self.defaultSize)
+			self.setMinimumSize(QSize(w,h))
+			self.label.setMinimumWidth(self.width()/1.1)
 		return
+	#def loadImg
 	
 	def loadImgSync(self,img):
 		if img==None:
@@ -211,7 +221,7 @@ class QPushInfoButton(QPushButton):
 				icn=QtGui.QPixmap(imgCache)
 			elif img.startswith("http"):
 				try:
-					raw=requests.get(img)
+					raw=requests.get(img,timeout=1)
 				except:
 					icn2=QtGui.QIcon.fromTheme("preferences-system")
 					icn=icn2.pixmap(self.defaultSize,self.defaultSize)
