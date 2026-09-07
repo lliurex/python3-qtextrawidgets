@@ -6,12 +6,13 @@ class QScrollLabel(QScrollArea):
 	linkActivated=Signal("PyObject")
 	def __init__(self,*args,**kwargs):
 		parent = kwargs.get('parent')
+		styled=kwargs.get("styled",True)
 		text = kwargs.get('text',"")
 		if not parent:
 			for i in args:
 				if isinstance(i,QWidget):
 					parent = i
-		super().__init__(*args,**kwargs)
+		super().__init__(*args)
 		self.setWidgetResizable(True)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
