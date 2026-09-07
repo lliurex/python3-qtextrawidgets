@@ -4,20 +4,22 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter, QLinearGradient, QColor
 
 class QStyledLabel(QLabel):
-	def __init__(self, text="", parent=None):
+	def __init__(self, text="", parent=None,styled=True):
 		super().__init__(text, parent)
 		self.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.setStyleSheet("color: rgb(10,20,25);padding:5px")
-		self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)  # Transparent background
-		self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent,False)
-		self.setAutoFillBackground(True)
-		self.colorFrom=QColor(224, 214, 255,50)
-		self.colorTo=QColor(128, 100, 228,220)
-		self.x1=1.2
-		self.x2=1.1
+		if styled==True:
+			self.setStyleSheet("color: rgb(10,20,25);padding:5px")
+			self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)  # Transparent background
+			self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent,False)
+			self.setAutoFillBackground(True)
+			self.colorFrom=QColor(224, 214, 255,50)
+			self.colorTo=QColor(128, 100, 228,220)
+			self.x1=1.2
+			self.x2=1.1
+			self.paintEvent=self._paintEvent
 	#def __init__(self, text="", parent=None):
 
-	def paintEvent(self, event):
+	def _paintEvent(self, event):
 		painter = QPainter(self)
 		painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 		gradient = QLinearGradient(self.width()/self.x1, 0, self.width()/self.x2, self.height())
@@ -26,7 +28,7 @@ class QStyledLabel(QLabel):
 		painter.fillRect(self.rect(), gradient)
 		super().paintEvent(event)
 		painter.end()
-	#def paintEvent
+	#def _paintEvent
 
 	def setGradient(self,colorF,colorT):
 		if isinstance(colorF,QColor):
