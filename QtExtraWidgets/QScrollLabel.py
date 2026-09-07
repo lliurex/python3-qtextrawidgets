@@ -1,28 +1,30 @@
 from PySide2.QtWidgets import QScrollArea,QVBoxLayout,QLabel,QWidget
 from PySide2.QtCore import Qt,Signal
+from QtExtraWidgets import QStyledLabel
 
 class QScrollLabel(QScrollArea):
 	linkActivated=Signal("PyObject")
 	def __init__(self,*args,**kwargs):
 		parent = kwargs.get('parent')
+		styled=kwargs.get("styled",True)
 		text = kwargs.get('text',"")
 		if not parent:
 			for i in args:
 				if isinstance(i,QWidget):
 					parent = i
-		super().__init__(*args,**kwargs)
+		super().__init__(*args)
 		self.setWidgetResizable(True)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+		self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 		content = QWidget(self)
 		self.setWidget(content)
 		lay = QVBoxLayout(content)
-		self.label = QLabel(content)
+		self.label = QStyledLabel.QStyledLabel(parent=content,styled=styled)
 		self.label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
 		self.label.linkActivated.connect(self._emitLink)
 		self.label.setWordWrap(True)
 		lay.addWidget(self.label)
 		self.label.setText(text)
-		self.label.adjustSize()
 #		self.setFixedWidth(self.label.sizeHint().width())
 #		self.setFixedHeight(self.label.sizeHint().height()/2)
 	#def __init__
@@ -37,6 +39,14 @@ class QScrollLabel(QScrollArea):
 #		self.setFixedHeight(self.label.sizeHint().height())
 		self.label.adjustSize()
 	#def setText
+
+	def setGradient(self,colorF,colorT):
+		self.label.setGradient(colorF,colorT)
+	#def setGradient
+
+	def setForeground(self,color):
+		self.label.setForeground(color)
+	#def setForeground
 
 	def setWordWrap(self,boolWrap):
 		self.label.setWordWrap(boolWrap)
