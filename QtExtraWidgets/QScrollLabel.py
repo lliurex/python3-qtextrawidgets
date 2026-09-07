@@ -6,19 +6,20 @@ class QScrollLabel(QScrollArea):
 	linkActivated=Signal("PyObject")
 	def __init__(self,*args,**kwargs):
 		parent = kwargs.get('parent')
+		styled=kwargs.get("styled",True)
 		text = kwargs.get('text',"")
 		if not parent:
 			for i in args:
 				if isinstance(i,QWidget):
 					parent = i
-		super().__init__(*args,**kwargs)
+		super().__init__(*args)
 		self.setWidgetResizable(True)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
 		content = QWidget(self)
 		self.setWidget(content)
 		lay = QVBoxLayout(content)
-		self.label = QStyledLabel.QStyledLabel(parent=content)
+		self.label = QStyledLabel.QStyledLabel(parent=content,styled=styled)
 		self.label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
 		self.label.linkActivated.connect(self._emitLink)
 		self.label.setWordWrap(True)
