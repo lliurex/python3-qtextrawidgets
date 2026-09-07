@@ -1,3 +1,29 @@
+python3-qtextrawidgets (1.0.0) jammy; urgency=medium
+
+  * QFlowTouchWidget:
+  *  Add parameter for spacing
+  *  showVerticalScrollBar call
+  * QStyledLabel:
+  *  Add gradient background
+  * QPushInfoButton:
+  *  Add sync and async methods for loadImg
+  *  If scroll=True layout uses three rows
+  *  Add overlay layout (shows desc in mouseOver event)
+  *  Use QScrollLabel for description
+  *  Improve sizeHint calc
+  * QSearchBox
+  *  Split signals for each source
+  * QScrollLabel
+  *  Add methods for customize inner QStyleLabel
+  * QScreenshotContainer
+  *  Add custom widgets
+  *  Optional callback for signal activated
+  * QStyledLabel
+  *  New QLabel with decorated background
+  *  Supports gradients or solid colors
+
+ -- Juanma1980 <juanma1980@gmail.com>  Mon, 07 Sep 2026 13:28:00 +0200
+
 python3-qtextrawidgets (0.6.8) jammy; urgency=medium
 
   * QStackedWindow:
