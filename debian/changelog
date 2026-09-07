@@ -9,7 +9,7 @@ python3-qtextrawidgets (1.0.0) noble; urgency=medium
   *  Add sync and async methods for loadImg
   *  If scroll=True layout uses three rows
   *  Add overlay layout (shows desc in mouseOver event)
-  *  Use QScollLabel for description
+  *  Use QScrollLabel for description
   *  Improve sizeHint calc
   * QSearchBox
   *  Split signals for each source
@@ -18,6 +18,9 @@ python3-qtextrawidgets (1.0.0) noble; urgency=medium
   * QScreenshotContainer
   *  Add custom widgets
   *  Optional callback for signal activated
+  * QStyledLabel
+  *  New QLabel with decorated background
+  *  Supports gradients or solid colors
 
  -- Juanma1980 <juanma1980@gmail.com>  Thu, 03 Sep 2026 12:25:23 +0200
 
