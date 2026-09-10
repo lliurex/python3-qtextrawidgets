@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import sys
 import os
-from PySide6.QtWidgets import QLabel, QPushButton,QGridLayout,QHBoxLayout,QLabel
+from PySide6.QtWidgets import QLabel, QPushButton,QGridLayout,QHBoxLayout,QSizePolicy
 from PySide6 import QtGui
 from PySide6.QtCore import Qt,Signal,QSize,QThread
 from QtExtraWidgets import QTableTouchWidget,QStackedWindowItem,QScrollLabel,QStyledLabel
