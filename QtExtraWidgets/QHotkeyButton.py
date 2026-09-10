@@ -1,7 +1,7 @@
 import os
-from PySide2.QtWidgets import QPushButton,QWidget
-from PySide2.QtCore import Qt,Signal,QEvent
-from PySide2.QtGui import QKeySequence
+from PySide6.QtWidgets import QPushButton,QWidget
+from PySide6.QtCore import Qt,Signal,QEvent
+from PySide6.QtGui import QKeySequence
 
 class QHotkeyButton(QPushButton):
 	keybind_signal=Signal("PyObject")

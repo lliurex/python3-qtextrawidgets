@@ -1,8 +1,8 @@
 #### FROM FlowLayout QT EXAMPLES ####
 
-from PySide2.QtWidgets import QScroller,QWidget,QLayout,QLabel,QSizePolicy,QScrollArea,QApplication
-from PySide2.QtCore import Qt,QSize,QRect,QPoint,QEvent,Signal
-import PySide2
+from PySide6.QtWidgets import QScroller,QWidget,QLayout,QLabel,QSizePolicy,QScrollArea,QApplication
+from PySide6.QtCore import Qt,QSize,QRect,QPoint,QEvent,Signal
+import PySide6
 import time
 
 class _layout(QLayout):
