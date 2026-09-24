@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-from PySide6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPainter, QLinearGradient, QColor
+from PySide2.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QPainter, QLinearGradient, QColor
 
 class QStyledLabel(QLabel):
 	def __init__(self, text="", parent=None,styled=True):

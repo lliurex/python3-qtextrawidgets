@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QScrollArea,QGridLayout,QLabel,QWidget,QPushButton
-from PySide6.QtGui import QIcon,QColor,QPalette
-from PySide6.QtCore import Qt,Signal,QSize,QTimer
+from PySide2.QtWidgets import QScrollArea,QGridLayout,QLabel,QWidget,QPushButton
+from PySide2.QtGui import QIcon,QColor,QPalette
+from PySide2.QtCore import Qt,Signal,QSize,QTimer
 
 #Label for notification purposes
 
