@@ -24,7 +24,7 @@ from distutils.core import setup
 if __name__ == '__main__':
 
     setup(name='python3-qtextrawidgets',
-        version='0.4',
+        version='1.0',
         description='Some widgets for pySide',
         long_description="""""",
         author='Lliurex Team',
