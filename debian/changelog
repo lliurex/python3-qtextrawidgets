@@ -1,3 +1,10 @@
+python3-qtextrawidgets (1.0.1) noble; urgency=medium
+
+  * QPushInfoButton:
+  *  Increase timeout and disable ssl verify for img downloads
+
+ -- Juanma1980 <juanma1980@gmail.com>  Tue, 20 Oct 2026 12:26:22 +0200
+
 python3-qtextrawidgets (1.0.0) noble; urgency=medium
 
   * QFlowTouchWidget:
