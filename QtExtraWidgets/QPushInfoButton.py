@@ -88,7 +88,7 @@ class _loadImage(QThread):
 			try:
 				pxm=QtGui.QPixmap()
 				if ("://") in self.img:
-					img=requests.get(self.img,timeout=1)
+					img=requests.get(self.img,timeout=3,verify=False)
 					pxm.loadFromData(img.content)
 					gotImg=True
 				else:
@@ -221,8 +221,8 @@ class QPushInfoButton(QPushButton):
 				icn=QtGui.QPixmap(imgCache)
 			elif img.startswith("http"):
 				try:
-					raw=requests.get(img,timeout=1)
-				except:
+					raw=requests.get(img,timeout=3,verify=False)
+				except Exception as e:
 					icn2=QtGui.QIcon.fromTheme("preferences-system")
 					icn=icn2.pixmap(self.defaultSize,self.defaultSize)
 				else:
